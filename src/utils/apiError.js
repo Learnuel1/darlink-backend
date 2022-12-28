@@ -18,7 +18,6 @@ static unauthenticated(msg, status = 401){
     return new this(message, status)
 }
 static customError(msg = 'Unknown Error', status = 500){
-   
     return new this(msg, status)
 }
 }

@@ -1,10 +1,12 @@
 const express =require('express');
-const { notFound, errorHandler } = require('../middlewares/error.middleware');
-
+ 
+const Controller = require('../controllers');
+const { errorMiddleWareModule } = require('../middlewares');
 const userRoute=express.Router();
+userRoute.get("/forgot-password",Controller.userControl.ctrlFindUser);
 
-userRoute.use("*",notFound);
-userRoute.all(errorHandler);
+userRoute.use("*",errorMiddleWareModule.notFound);
+userRoute.all(errorMiddleWareModule.errorHandler);
 
 module.exports={
     userRoute,

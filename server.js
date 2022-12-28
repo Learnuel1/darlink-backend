@@ -9,10 +9,11 @@ app.use('/api/v1/',appRoute.routesRouter)
 
 app.use('*',errorMiddleWareModule.notFound);
 app.all(errorMiddleWareModule.errorHandler);
+
 app.listen(PORT,async()=>{
 try {
-    await dbConnect.sqlConnection();
-    console.log(`server running on port ${PORT}`)
+   await dbConnect.sqlConnection();
+   console.log(`server running on port ${PORT}`)
 } catch (error) {
     console.log(error)
 }

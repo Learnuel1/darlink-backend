@@ -1,6 +1,6 @@
-const { compareSync } = require("bcryptjs");
+const { compareSync, hashSync } = require("bcryptjs");
 const { getTokenSecrete, getRefreshTokenSecrete } = require("../config/env");
-const { getUsername, userExist } = require("../services");
+const { getUsername, userExist, resetUserLogin } = require("../services");
 const { APIError } = require("../utils/apiError");
 const jwt = require('jsonwebtoken');
 const responseBuilder = require('../utils/responsBuilder');
@@ -16,24 +16,21 @@ exports.ctrLogin =async(req,res,next)=>{
         next(APIError.customError("User does  not exist",404));
         if(exist.error)
         next(APIError.customError());
-
-        const verify = compareSync(password,exist.Password);
+        const verify = compareSync(password,exist.password);
         if(!verify)
         next(APIError.unauthenticated("Incorrect password"));
         const data = responseBuilder.buildUser(exist);
-        const payload = {id:exist.UserId,role:exist.Role};
+        const payload = {id:exist.userId,role:exist.Role};
         const token = jwt.sign(payload,getTokenSecrete(),{expiresIn:'30m'});
         const refreshToken = jwt.sign(payload,getRefreshTokenSecrete(),{expiresIn:"60m"});
-
-       const response  = await responseBuilder.commonReponse("login successful",data,"user",{token,refreshToken});
-
-
+       const response  = responseBuilder.commonReponse("login successful",data,"user",{token,refreshToken});
+      
         res.cookie('jwt',token,{
             httpOnly:false,
             secure:true,
             sameSite:'none',
             maxAge:60*60*1000
-        })
+        });
         res.status(200).json(response)
     } catch (error) {
         next(error);
@@ -56,5 +53,34 @@ exports.ctrLogout=async(req,res,next)=>{
 
     } catch (error) {
         next(error);
+    }
+}
+exports.ctrlResetLogin =async(req,res,next)=>{
+    try {
+        const {currentPassword, newPassword}=req.body;
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        if(!currentPassword)
+        return next(APIError.badRequest("Provide current password"))
+        if(!newPassword)
+        return next(APIError.badRequest("Provide new password"))
+        const check = await userExist(req.userId);
+        if(!check)
+        return next(APIError.customError("Incorrect password",404))
+        if(check.error)
+        return next(APIError.customError(check.error,400));
+        const verify = compareSync(currentPassword,check.password);
+        if(!verify)
+        return next(APIError.customError("current password is incorrect",400));
+        const hashedPass = hashSync(newPassword,12);
+        const reset=await resetUserLogin(req.userId,hashedPass);
+        if(!reset)
+        return next(APIError.customError());
+        if(reset.error)
+        return next(APIError.customError(reset.error,400))
+
+        res.status(200).json({success:true,msg:"Password reset successful"});
+    } catch (error) {
+        next(error)
     }
 }

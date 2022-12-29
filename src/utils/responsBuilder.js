@@ -1,5 +1,5 @@
 const buildUser =(userObj)=>{
-    const {UserId,Password,...data}=userObj;
+    const {userId,password,...data}=userObj;
     return data
 }
 

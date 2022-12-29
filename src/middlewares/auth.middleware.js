@@ -1,7 +1,7 @@
-const { getTokenSecrete } = require("../config/env");
-const { UserModule } = require("../controller");
+const { getTokenSecrete } = require("../config/env"); 
 const { APIError } = require("../utils/apiError");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const { userExist } = require("../services");
 
 const adminRequired=(req,res,next)=>{
     try{
@@ -9,7 +9,7 @@ const adminRequired=(req,res,next)=>{
         if(!token)
         return next(APIError.unauthenticated()); 
         const payload = jwt.verify(token, getTokenSecrete());
-      if(payload.role.toLowerCase() !=="admin" && payload.role.toLowerCase() !=='dev' )
+      if(payload.role.toLowerCase() !=="admin" )
       return next(APIError.unauthorized()); 
         req.userId = payload.id;
         req.userRole = payload.role; 
@@ -18,20 +18,24 @@ const adminRequired=(req,res,next)=>{
     next(error);
     }
 }
-const userRequired =(req,res,next)=>{
+const userRequired =async(req,res,next)=>{
     try{
         const token = req.cookies.jwt;
         if(!token)
         return next(APIError.unauthenticated());
         const payload= jwt.verify(token,getTokenSecrete());
-        const isUser=  UserModule.checkByID(payload.id);
-        if(isUser.error)
+        const isUser= await  userExist(payload.id);
+        if(!isUser)
         return next(APIError.customError(`user does not exist`,404));
+        if(isUser.error)
+        return next(APIError.customError(isUser.error));
         req.userId=payload.id;
         req.userRole=payload.role;
         next();
     }catch(error){
-        next(error);
+        if( error.message ==='jwt expired')
+        next(APIError.customError('session expired',400))
+       else next(error);
     }
 }
 

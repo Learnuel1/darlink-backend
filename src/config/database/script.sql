@@ -1,4 +1,5 @@
 
+
 DROP TABLE IF EXISTS tblusers;
 CREATE TABLE tblusers(
     Id INT NOT NULL IDENTITY(1,1)
@@ -6,7 +7,8 @@ CREATE TABLE tblusers(
     ,Username VARCHAR(40) NOT NULL UNIQUE
     ,Password VARCHAR(255) NOT NULL
     ,Email VARCHAR(255) NOT NULL UNIQUE
-    ,RefreshToken VARCHAR(255) NOT NULL DEFAULT "none"
+    ,RefreshToken VARCHAR(255) NOT NULL DEFAULT('none')
+	,Role VARCHAR(30) NOT NULL CHECK(Role IN('user','admin')) DEFAULT('user')
     ,CreatedAt DATETIME NOT NULL DEFAULT GETDATE()
     ,UpdatedAt DATETIME NOT NULL DEFAULT GETDATE()
     ,CONSTRAINT PK_User PRIMARY KEY(UserId)

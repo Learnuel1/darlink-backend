@@ -6,7 +6,7 @@ const sqlConfig = {
     // user: getDB_USER(),
     // password: getDB_PWD(),
     database: DB,
-    server: "LEARNUELTECH_1\\SQLEXPRESS",
+    server: "LEARNUELTECHNOL\\SQLEXPRESS",
     driver:"msnodesqlv8",
     pool: {
       max: 10,

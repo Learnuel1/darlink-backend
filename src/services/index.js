@@ -12,3 +12,4 @@ exports.findUserAccount =async(infor)=>UserModule.findAccount(infor);
 exports.sendRecoverMail=async(details)=>UserModule.recoverPassword(details);
 exports.uploadProfile=async(details)=>UserModule.profile(details);
 exports.getUserProfile= async(userId)=>UserModule.getProfile(userId);
+exports.getUserPlan = async(userId)=>UserModule.userPlan(userId);

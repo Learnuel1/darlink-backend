@@ -142,7 +142,6 @@ exports.resetPass=async(userid,newPassword)=>{
         request.input('password',sql.VarChar(255),newPassword);
         request.input('userid',sql.VarChar(255),userid);
      await   request.query("UPDATE tblusers SET password =@password WHERE userId=@userid").then(result=>{
-        console.log(result)
             if(result.rowsAffected>0)
             data=result.rowsAffected;
             else data ={"error":"Password reset failed"}
@@ -158,8 +157,79 @@ exports.resetPass=async(userid,newPassword)=>{
 
 exports.recoverPassword =async(details)=>{
     try {
-        
+        //TO DO
+        //Send recovery link to E-mail
     } catch (error) {
         return {error}
+    }
+}
+
+exports.profile =async(details)=>{
+    try {
+        const fields=[];
+        const userId=details.userId;
+        let bgId,bgUrl,passportId,passportUrl,displayName,description,location,contact,data,existingData;
+        if(details.bgId)
+        bgId=details.bgId;
+        if(details.bgUrl)
+        bgUrl=details.bgUrl;
+        if(details.passportId)
+        passportId=details.passportId;
+        if(details.passportUrl)
+        passportUrl=details.passportUrl;
+        if(details.displayName)
+        displayName=details.displayName;
+        if(details.description)
+        description=details.description;
+        if(details.location)
+        location=details.location;
+        if(details.contact)
+        contact=details.contact;
+        const request = new sql.Request();
+        request.input(`userId`,sql.VarChar(255),userId)
+        request.input(`profileId`,sql.VarChar(255),cuid())
+        request.input(`bgId`,sql.VarChar(255),bgId)
+        request.input(`bgUrl`,sql.VarChar(255),bgUrl)
+        request.input(`passportId`,sql.VarChar(255),passportId)
+        request.input(`passportUrl`,sql.VarChar(255),passportUrl)
+        request.input(`displayName`,sql.VarChar(50),displayName)
+        request.input(`description`,sql.VarChar(255),description)
+        request.input(`location`,sql.VarChar(255),location) 
+        request.input(`contact`,sql.VarChar(255),contact) 
+        await request.query(`IF (SELECT COUNT(Id) FROM tblprofile)=0 
+        BEGIN 
+        INSERT INTO tblprofile(profileId,userId,bgId,bgUrl,passportId,
+            passportUrl,
+            description, 
+            displayName,location,contact)
+             VALUES (@profileId,@userId,
+                @bgId,
+                @bgUrl,
+                @passportId,
+                @passportUrl,
+                @description, 
+                @displayName,
+                @location,@contact)
+            END
+           
+           `).then(result=>{
+            if(result.rowsAffected>0){
+                data=result.rowsAffected;
+            }else if(result.recordset.length>0){
+                existingData=result.recordset[0];
+            }
+        }).then(err=>{
+            if(err)
+            data={"error":err}
+        })
+         console.log(existingData)                                       
+        if(existingData){
+            for(key in existingData){
+
+            }
+        }
+    } catch (error) {
+        console.log(error)
+        return {error};
     }
 }

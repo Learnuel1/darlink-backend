@@ -5,5 +5,7 @@ exports.notFound=(req,res,next)=>{
 }
 
 exports.errorHandler=(err,req,res,next)=>{ 
-       res.status(err.status||500).json({error:err.message|| "Unknow error"});
+    if(err.error)
+        res.status(err.status||404).json({error:"No Internet connection"})
+      else res.status(err.status||500).json({error:err.message|| "Unknow error"});
 }

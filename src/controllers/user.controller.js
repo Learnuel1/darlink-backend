@@ -1,8 +1,10 @@
 const { hashSync } = require("bcryptjs");
-const { registerUser, userExist, getUsername, getUserbyEmail, findUserAccount } = require("../services");
+const { registerUser, userExist, getUsername, getUserbyEmail, findUserAccount, uploadProfile } = require("../services");
 const { APIError } = require("../utils/apiError");
 const { isValidEmail } = require("../utils/validation");
 const responseBuilder = require('../utils/responsBuilder');
+const { cloudinary, accessPath } = require("../utils/cloudinary");
+const { appPool } = require("../config/database");
 exports.ctrRegister =async(req,res,next)=>{
     try{
         const {username,password,email}=req.body;
@@ -87,6 +89,51 @@ exports.ctrlFindUser=async(req,res,next)=>{
         }
     } catch (error) {
         next(error);
+    }
+}
+exports.ctrlUserProfile=async(req,res,next)=>{
+    try {
+        const {displayName,contact,description,location}=req.body;
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        
+        if(!displayName)
+        return next(APIError.badRequest(`Display name is required`))
+        if(!location)
+        return next(APIError.badRequest(`Location name is required`))
+        if(!contact)
+        return next(APIError.badRequest(`Contact name is required`))
+        if(!description)
+        return next(APIError.badRequest(`Bio name is required`))
+        const details={displayName,location,contact,description};
+        if(req.body.profileImage){
+            //store image
+        const img=await    cloudinary.uploader.upload(req.body.profileImage,{
+                upload_preset:accessPath.preset(),
+                folder:accessPath.folder()
+            })
+            details.passportId=img.public_id;
+            details.passportUrl=img.secure_url;
+        }
+        if(req.body.bgImage){
+            const img=await    cloudinary.uploader.upload(req.body.profileImage,{
+                upload_preset:accessPath.preset(),
+                folder:accessPath.folder()
+            })
+            details.bgId=img.public_id;
+            details.bgUrl=img.secure_url;
+        }
+        details.userId=req.userId;
+        const profile = await uploadProfile(details);
+        if(!profile)
+        return next(APIError.customError());
+        if(profile.error)
+        return next(APIError.customError(profile.error,400));
+        
+        res.status(200).json({success:true,msg:`Updated sucessfully`})
+
+    } catch (error) {
+        next(error)
     }
 }
 exports.ctrlSendRecoverMail=async(req,res,next)=>{

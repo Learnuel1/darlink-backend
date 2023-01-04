@@ -12,14 +12,13 @@ CREATE PROC sp_register
  BEGIN TRY
  BEGIN TRAN
  DECLARE @default varchar(255)
- SET @default=(SELECT * FROM tblplan WHERE [plan]=@plan)
+ SET @default=(SELECT planId FROM tblplan WHERE [plan]=@plan)
 
  INSERT INTO tblusers(userId,username,password,email,role)
  VALUES(@id,@username,@password,@email,@role)
  
  INSERT INTO tbluserplan(userPlanId,planId,userId) VALUES(@userplanid,@default,@id)
  COMMIT TRAN
-
  
  END TRY
  BEGIN CATCH

@@ -49,13 +49,33 @@ id INT NOT NULL IDENTITY(1,1)
  );
  GO
 
+ CREATE TABLE tblplan(
+ id INT NOT NULL IDENTITY(1,1)
+ ,planId VARCHAR(255) NOT NULL
+ ,userId VARCHAR(255) NULL
+  ,[plan] VARCHAR(40) NOT NULL CHECK([plan] IN('Beginner','Personal','Entrepreneur','Professional')) DEFAULT('Beginner')
+ ,amount decimal(9,2) NOT NULL DEFAULT(0.00)
+ ,duration varchar(10) NOT NULL DEFAULT('0Mnts')
+ ,createdAt DATETIME NOT NULL DEFAULT GETDATE()
+ ,updatedAt DATETIME NOT NULL DEFAULT GETDATE()
+ ,CONSTRAINT PK_plan PRIMARY KEY(planId)
+ ,CONSTRAINT FK_planUser FOREIGN KEY(userId) REFERENCES tblusers(userId) ON DELETE SET NULL
+ );
+ GO
+
  CREATE TABLE tbluserplan(
  id INT NOT NULL IDENTITY(1,1)
+ ,userPlanId VARCHAR(255) NOT NULL
  ,planId VARCHAR(255) NOT NULL
  ,userId VARCHAR(255) NULL
  ,[plan] VARCHAR(40) NOT NULL CHECK([plan] IN('Beginner','Personal','Entrepreneur','Professional')) DEFAULT('Beginner')
  ,amount decimal(9,2) NOT NULL DEFAULT(0.00)
+ ,startDate DATE NOT NULL DEFAULT GETDATE()
+ ,endDate DATE NULL
  ,createdAt DATETIME NOT NULL DEFAULT GETDATE()
-  ,updatedAt DATETIME NOT NULL DEFAULT GETDATE()
+ ,updatedAt DATETIME NOT NULL DEFAULT GETDATE()
+  ,CONSTRAINT PK_userplan PRIMARY KEY(userPlanId)
+  ,CONSTRAINT FK_planUserplan FOREIGN KEY(planId) REFERENCES tblplan(planId) ON DELETE CASCADE
+  ,CONSTRAINT FK_userplanUser FOREIGN KEY(userId) REFERENCES tblusers(userId) ON DELETE SET NULL
  );
 SELECT * FROM tblprofile;

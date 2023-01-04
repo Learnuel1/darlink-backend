@@ -10,3 +10,4 @@ exports.getUserbyEmail =async(email)=>UserModule.userEmail(email);
 exports.resetUserLogin =async(userId,newPassword)=>UserModule.resetPass(userId,newPassword);
 exports.findUserAccount =async(infor)=>UserModule.findAccount(infor);
 exports.sendRecoverMail=async(details)=>UserModule.recoverPassword(details);
+exports.uploadProfile=async(details)=>UserModule.profile(details);

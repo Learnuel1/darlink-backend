@@ -166,9 +166,9 @@ exports.recoverPassword =async(details)=>{
 
 exports.profile =async(details)=>{
     try {
-        const fields=[];
+        let data ;
         const userId=details.userId;
-        let bgId,bgUrl,passportId,passportUrl,displayName,description,location,contact,data,existingData;
+        let bgId,bgUrl,passportId,passportUrl,displayName,description,location,contact;
         if(details.bgId)
         bgId=details.bgId;
         if(details.bgUrl)
@@ -211,25 +211,49 @@ exports.profile =async(details)=>{
                 @displayName,
                 @location,@contact)
             END
-           
+           ELSE
+           BEGIN
+           UPDATE tblprofile SET
+           bgId=@bgId,
+           bgUrl=@bgUrl,
+           passportId=@passportId,
+           passportUrl=@passportUrl,
+           [description]=@description, 
+           displayName=@displayName,
+           location=@location,
+           contact=@contact
+            WHERE userId=@userId
+           END
            `).then(result=>{
             if(result.rowsAffected>0){
-                data=result.rowsAffected;
-            }else if(result.recordset.length>0){
-                existingData=result.recordset[0];
-            }
-        }).then(err=>{
+                data=result.rowsAffected[0];
+            } 
+        }).catch(err=>{
             if(err)
             data={"error":err}
         })
-         console.log(existingData)                                       
-        if(existingData){
-            for(key in existingData){
-
-            }
-        }
+         return data
     } catch (error) {
-        console.log(error)
         return {error};
+    }
+}
+
+exports.getProfile=async(userId)=>{
+    try {
+        let data;
+        const request = new sql.Request();
+        request.input("userId",sql.VarChar(255),userId);
+        await  request.query(`SELECT * FROM tblprofile WHERE userId=@userId`).then(result=>{
+          
+            if(result.recordset.length>0){
+                data=result.recordset[0]; 
+            }
+        }).catch(err=>{
+            
+            data={'error':err};
+        })
+        return data;
+    } catch (error) {
+        
     }
 }

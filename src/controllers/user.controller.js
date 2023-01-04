@@ -1,10 +1,11 @@
 const { hashSync } = require("bcryptjs");
-const { registerUser, userExist, getUsername, getUserbyEmail, findUserAccount, uploadProfile } = require("../services");
+const { registerUser, userExist, getUsername, getUserbyEmail, findUserAccount, uploadProfile, getUserProfile } = require("../services");
 const { APIError } = require("../utils/apiError");
 const { isValidEmail } = require("../utils/validation");
 const responseBuilder = require('../utils/responsBuilder');
 const { cloudinary, accessPath } = require("../utils/cloudinary");
 const { appPool } = require("../config/database");
+ 
 exports.ctrRegister =async(req,res,next)=>{
     try{
         const {username,password,email}=req.body;
@@ -93,6 +94,7 @@ exports.ctrlFindUser=async(req,res,next)=>{
 }
 exports.ctrlUserProfile=async(req,res,next)=>{
     try {
+        
         const {displayName,contact,description,location}=req.body;
         if(!req.userId)
         return next(APIError.unauthenticated());
@@ -130,15 +132,33 @@ exports.ctrlUserProfile=async(req,res,next)=>{
         if(profile.error)
         return next(APIError.customError(profile.error,400));
         
-        res.status(200).json({success:true,msg:`Updated sucessfully`})
+        res.status(200).json({success:true,msg:`Profile updated sucessfully`})
 
     } catch (error) {
         next(error)
     }
 }
-exports.ctrlSendRecoverMail=async(req,res,next)=>{
+exports.ctlGetProfile=async(req,res,next)=>{
     try {
         
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        const profile = await getUserProfile(req.userId);
+        if(!profile)
+        return next(APIError.customError("user does not exist",404));
+        if(profile.error)
+        return next(APIError.customError(profile.error,400));
+      const data=  responseBuilder.buildProfile(profile);
+           const response = responseBuilder.commonReponse("Found",data,"profile");
+           res.status(200).json(response);
+    } catch (error) {
+        next(error);
+    }
+}
+exports.ctrlSendRecoverMail=async(req,res,next)=>{
+    try {
+        //TO DO
+        //send recovery mail
     } catch (error) {
         next(error);
     }

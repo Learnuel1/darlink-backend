@@ -7,6 +7,7 @@ const userRoute=express.Router();
 userRoute.get("/forgot-password",Controller.userControl.ctrlFindUser);
 userRoute.post('/recovery-mail',Controller.userControl.ctrlSendRecoverMail);
 userRoute.post('/profile',userRequired,Controller.userControl.ctrlUserProfile);
+userRoute.get('/profile',userRequired,Controller.userControl.ctlGetProfile);
 
 userRoute.use("*",errorMiddleWareModule.notFound);
 userRoute.all(errorMiddleWareModule.errorHandler);

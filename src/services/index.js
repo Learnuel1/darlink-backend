@@ -11,3 +11,4 @@ exports.resetUserLogin =async(userId,newPassword)=>UserModule.resetPass(userId,n
 exports.findUserAccount =async(infor)=>UserModule.findAccount(infor);
 exports.sendRecoverMail=async(details)=>UserModule.recoverPassword(details);
 exports.uploadProfile=async(details)=>UserModule.profile(details);
+exports.getUserProfile= async(userId)=>UserModule.getProfile(userId);

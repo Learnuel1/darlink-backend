@@ -12,7 +12,12 @@ const commonReponse =(msg,data,field='data',others={}, op=true)=>{
     }
     return response;
 }
+const buildProfile =(profileObj)=>{
+    const {id,userId,profileId,...data}=profileObj;
+    return data;
+}
 module.exports ={
     buildUser,
     commonReponse,
+    buildProfile,
 }

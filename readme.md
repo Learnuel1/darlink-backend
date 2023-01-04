@@ -1,6 +1,33 @@
+
+# DARLINK BACKEND API SERVER FOR DASHBOARD (USER AND ADMIN)
+
+This is the backend API Server for the Darlink User and Admin dashboards.
+
+## STACKS
+
+## Main
+
+1. Node
+2. ExpressJS
+3. SqlDB
+
+- Package Manager: `npm`
+
+## GET STARTED
+
+1. Clone the repo and install dependencies using `npm install`
+2. Duplicate the `.env.example.show` and rename one of them ot `.env`
+3. Update the `.env with the appropriate values.
+4. Install `mssql` and `msnodesqlv8` drivers using `npm i mssql -save` and `npm i msnodesqlv8` respectively.
+5. Goto `src/config/database/index.js` and update the  `server` field with the instance of your `SQL server instance`.
+6. Use `npm run dev` to run the server locally
+
+
+
 ## APPLICATION DESCRIPTION
 
  https://solo-2.vercel.app/
+
 
 
 ## Sample Site

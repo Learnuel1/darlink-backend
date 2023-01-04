@@ -15,7 +15,7 @@ app.use(cors({
  app.set("trust proxy",1)
 app.use(morgan('dev'));
 app.use(cookieparser());
-app.disable('etag');//clear cache history to avoid error 304
+app.disable('etag');//clear cache history to agitvoid error 304
 app.use(express.json({limit:'5mb'}));
 app.use(urlencoded({limit:'5mb', extended:true}));
 

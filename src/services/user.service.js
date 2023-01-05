@@ -107,6 +107,25 @@ exports.username = async (username) => {
     return { error: error };
   }
 };
+exports.currentPlan = async (userId) => {
+  try {
+    let data;
+
+    const request = new sql.Request();
+    request.input("userId", sql.VarChar(40), username.trim());
+    await request
+      .query(`SELECT * FROM tblusersplan WHERE userId=@userId`)
+      .then((result) => {
+        if (result.recordset.length > 0) data = result.recordset[0];
+      })
+      .then((err) => {
+        if (err) data = { error: err };
+      });
+    return data;
+  } catch (error) {
+    return { error: error };
+  }
+};
 
 exports.findAccount = async (infor) => {
   try {
@@ -246,7 +265,8 @@ exports.profile = async (details) => {
            [description]=@description, 
            displayName=@displayName,
            location=@location,
-           contact=@contact
+           contact=@contact,
+           updatedAt=GETDATE()
             WHERE userId=@userId
            END
            `
@@ -361,17 +381,23 @@ exports.deletePlan = async (planId) => {
   };
 exports.updatePlan = async (details) => {
     try {
-      let data;
+      let data,plan,amount,duration;
+      if(details.plan)
+      plan=details.plan
+      if(details.amount)
+      amount=details.amount
+      if(details.duration)
+      duration=details.duration
       const request = new sql.Request();
-      request.input("planid", sql.VarChar(255), details.planId);
-      request.input("plan", sql.VarChar(60), details.plan);
-      request.input("amount", sql.Decimal, details.amount);
-      request.input("duration", sql.VarChar(10), details.duration);
+      request.input("planId", sql.VarChar(255), details.planId);
+      request.input("plans", sql.VarChar(60), plan);
+      request.input("amount", sql.Decimal, amount);
+      request.input("duration", sql.VarChar(10), duration);
       await request
-        .query(`UPDATE tblplan SET plan=@plan, amount=@amount, duration=@duration WHERE planId=@planid `)
+        .execute(`sp_update_plan`)
         .then((result) => {
-          if (result.rowsAffected>0) {
-            data = result.recordset[0];
+          if (result.rowsAffected.length>0) {
+            data = result.rowsAffected[0];
           }
         }).catch(err=>{
             data={error:err}
@@ -381,6 +407,7 @@ exports.updatePlan = async (details) => {
       return { error };
     }
   };
+
 exports.profileLink = async (details) => {
   try {
   } catch (error) {

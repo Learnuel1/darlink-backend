@@ -1,6 +1,6 @@
 const { compareSync, hashSync } = require("bcryptjs");
 const { getTokenSecrete, getRefreshTokenSecrete } = require("../config/env");
-const { getUsername, userExist, resetUserLogin } = require("../services");
+const { getUsername, userExist, resetUserLogin, getCurrentPlan } = require("../services");
 const { APIError } = require("../utils/apiError");
 const jwt = require('jsonwebtoken');
 const responseBuilder = require('../utils/responsBuilder');
@@ -19,8 +19,16 @@ exports.ctrLogin =async(req,res,next)=>{
         const verify = compareSync(password,exist.password);
         if(!verify)
         next(APIError.unauthenticated("Incorrect password"));
+        let payload={};
+        const userPlan= await getCurrentPlan(exist.userId);
+        if(!userPlan.error && userPlan){
+
+            payload = {id:exist.userId,role:exist.role,plan:userPlan.plan};
+        }else{
+
+            payload = {id:exist.userId,role:exist.role};
+        }
         const data = responseBuilder.buildUser(exist);
-        const payload = {id:exist.userId,role:exist.role};
         const token = jwt.sign(payload,getTokenSecrete(),{expiresIn:'30m'});
         const refreshToken = jwt.sign(payload,getRefreshTokenSecrete(),{expiresIn:"60m"});
        const response  = responseBuilder.commonReponse("login successful",data,"user",{token,refreshToken});

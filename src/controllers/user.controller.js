@@ -7,13 +7,13 @@ const { registerUser,
     plans, 
     getPlans, 
     getUserPlan,
-    deletePlan} = require("../services");
+    deletePlan,
+    updatePlan} = require("../services");
 const { APIError } = require("../utils/apiError");
 const { isValidEmail } = require("../utils/validation");
 const responseBuilder = require('../utils/responsBuilder');
 const { cloudinary, accessPath } = require("../utils/cloudinary");
-const { ACTIONS } = require("../utils/actions");
- 
+const { ACTIONS } = require("../utils/actions"); 
 exports.ctrRegister =async(req,res,next)=>{
     try{
         const {username,password,email}=req.body;
@@ -242,15 +242,26 @@ exports.ctrlDelatePlan=async(req,res,next)=>{
 }
 exports.ctrlUpdatePlan=async(req,res,next)=>{
     try {
-        const [planid] = req.query();
+        const {planId} = req.query;
+       
         if(!req.userId)
         return next(APIError.unauthenticated());
         if(req.userRole.toLowerCase() !==ACTIONS.ADMIN)
         return next(APIError.unauthorized());
-      
-        if(!planid)
+        const details ={}
+        if(!planId)
         return next(APIError.badRequest("Plan id is required"));
-              
+        for(key in req.body){
+            details[key]=req.body[key];
+        }
+        details.planId=planId;
+        const updated = await updatePlan(details);
+        if(!updated)
+        return next(APIError.customError("No plan was found",404));
+        if(updatePlan.error)
+        return next(APIError.customError(updated.error,400));
+        const msg=ACTIONS.MESSAGE;
+        res.status(200).json({success:true,msg:"plan updated successfully"})
     } catch (error) {
         next(error);
     }

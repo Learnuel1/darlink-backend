@@ -28,3 +28,6 @@ CREATE PROC sp_register
  RAISERROR(@em,16,1)
  END CATCH
  END
+
+
+SELECT* from tblplan

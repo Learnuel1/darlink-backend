@@ -1,10 +1,18 @@
 const { hashSync } = require("bcryptjs");
-const { registerUser, userExist, getUsername, getUserbyEmail, findUserAccount, uploadProfile, getUserProfile } = require("../services");
+const { registerUser, 
+    findUserAccount, 
+    uploadProfile, 
+    getUserProfile, 
+    createAdmin, 
+    plans, 
+    getPlans, 
+    getUserPlan,
+    deletePlan} = require("../services");
 const { APIError } = require("../utils/apiError");
 const { isValidEmail } = require("../utils/validation");
 const responseBuilder = require('../utils/responsBuilder');
 const { cloudinary, accessPath } = require("../utils/cloudinary");
-const { appPool } = require("../config/database");
+const { ACTIONS } = require("../utils/actions");
  
 exports.ctrRegister =async(req,res,next)=>{
     try{
@@ -18,13 +26,11 @@ exports.ctrRegister =async(req,res,next)=>{
         if(!isValidEmail(email))
         next(APIError.badRequest("email is invalid"));
         const hashedPass = hashSync(password.trim(),12);
-        const register = await registerUser(username.trim(),hashedPass,email.trim());
+        const register = await registerUser(username.trim(),hashedPass,email.trim(),ACTIONS.DEFAULT_PLAN);
         if(!register)
         return next(APIError.customError())
-        
         if(register.error)
         return next(APIError.customError(register.error,400));
-
         res.status(200).json(register);
     }catch(error){
         next(error);
@@ -44,14 +50,14 @@ exports.ctrCreate =async(req,res,next)=>{
         if(!isValidEmail(email))
         next(APIError.badRequest("Email is invalid"));
         const hashedPass = hashSync(password.trim(),12);
-        const register = await registerUser(username.trim(),hashedPass,email.trim(),role.trim());
+        const details ={username,password:hashedPass,email,role}
+        const register = await createAdmin(details);
         if(!register)
         return next(APIError.customError())
         
         if(register.error)
         return next(APIError.customError(register.error,400));
-
-        res.status(200).json(register);
+        res.status(200).json({success:true,msg:"Account Created Successfully"});
     }catch(error){
         next(error);
     }
@@ -151,6 +157,100 @@ exports.ctlGetProfile=async(req,res,next)=>{
       const data=  responseBuilder.buildProfile(profile);
            const response = responseBuilder.commonReponse("Found",data,"profile");
            res.status(200).json(response);
+    } catch (error) {
+        next(error);
+    }
+}
+exports.ctrlPlan=async(req,res,next)=>{
+    try {
+        const {plan,amount,duration}=req.body;
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        if(req.userRole.toLowerCase() !==ACTIONS.ADMIN)
+        return next(APIError.unauthorized());
+        if(!plan)
+        return next(APIError.badRequest("Plan name is required"));
+        if(!amount)
+        return next(APIError.badRequest("Plan cost is required"));
+        if(!duration) 
+        return next(APIError.badRequest("Plan duration is required"));
+        const details ={plan,amount,duration,userId:req.userId};
+        const createPlan = await plans(details);
+        if(!createPlan)
+        return next(APIError.customError());
+        if(createPlan.error)
+        return next(APIError.customError(createPlan.error,400));
+        res.status(201).json({success:true,msg:"Plan created successfully"});
+    } catch (error) {
+        next(error);
+    }
+}
+exports.ctrlGetPlans=async(req,res,next)=>{
+    try {
+         
+    const plans = await getPlans();
+    if(!plans)
+    return next(APIError.customError("No plan exist",404));
+    if(plans.error)
+    return next(APIError.customError(plans.error,400));
+    const data = plans.map((item)=>{
+        return responseBuilder.buildPlan(item);
+    })
+    const response= responseBuilder.commonReponse("Found",data,"plans");
+    res.status(200).json(response);
+    } catch (error) {
+        next(error);
+    }
+}
+exports.ctrlGetUserPlans=async(req,res,next)=>{
+    try {
+    if(!req.userId)
+    return next(APIError.unauthenticated());
+
+    const plans = await getUserPlan(req.userId)
+    if(!plans)
+    return next(APIError.customError("No plan exist for this account",404));
+    if(plans.error)
+    return next(APIError.customError(plans.error,400));
+    const data = plans.map((item)=>{
+        return responseBuilder.buildPlan(item);
+    })
+    const response= responseBuilder.commonReponse("Found",data,"plans");
+    res.status(200).json(response);
+    } catch (error) {
+        next(error);
+    }
+}
+exports.ctrlDelatePlan=async(req,res,next)=>{
+    try {
+        const {planId} = req.query;
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        if(req.userRole.toLowerCase() !==ACTIONS.ADMIN)
+        return next(APIError.unauthorized());
+        if(!planId)
+        return next(APIError.badRequest("Plan id is required"));
+        const del = await deletePlan(planId);
+        if(!del)
+        return next(APIError.customError("Plan was not found",404));
+        if(del.error)
+        return next(APIError.customError(del.error,400));
+        res.status(200).json({success:true,msg:"Plan deleted successfully"});
+    } catch (error) {
+        next(error);
+    }
+}
+exports.ctrlUpdatePlan=async(req,res,next)=>{
+    try {
+        const [planid] = req.query();
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        if(req.userRole.toLowerCase() !==ACTIONS.ADMIN)
+        return next(APIError.unauthorized());
+      
+        if(!planid)
+        return next(APIError.badRequest("Plan id is required"));
+              
     } catch (error) {
         next(error);
     }

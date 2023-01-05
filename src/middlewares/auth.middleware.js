@@ -2,6 +2,7 @@ const { getTokenSecrete } = require("../config/env");
 const { APIError } = require("../utils/apiError");
 const jwt = require("jsonwebtoken");
 const { userExist, getUserPlan } = require("../services");
+const { ACTIONS } = require("../utils/actions");
 
 const adminRequired=(req,res,next)=>{
     try{
@@ -9,12 +10,14 @@ const adminRequired=(req,res,next)=>{
         if(!token)
         return next(APIError.unauthenticated()); 
         const payload = jwt.verify(token, getTokenSecrete());
-      if(payload.role.toLowerCase() !=="admin" )
+      if(payload.role.toLowerCase() !==ACTIONS.ADMIN)
       return next(APIError.unauthorized()); 
         req.userId = payload.id;
         req.userRole = payload.role; 
         next();
     }catch(error){
+        if( error.message ===ACTIONS.JWT_EXPIRED)
+        next(APIError.customError('session expired',400))
     next(error);
     }
 }
@@ -33,7 +36,7 @@ const userRequired =async(req,res,next)=>{
         req.userRole=payload.role;
         next();
     }catch(error){
-        if( error.message ==='jwt expired')
+        if( error.message ===ACTIONS.JWT_EXPIRED)
         next(APIError.customError('session expired',400))
        else next(error);
     }

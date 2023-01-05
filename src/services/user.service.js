@@ -1,7 +1,7 @@
 const { sql } = require("../config/database");
 const cuid = require("cuid");
 
-exports.register = async (username, password, email, role = "user") => {
+exports.register = async (username, password, email,plan, role = "user") => {
   try {
     let data;
     let check;
@@ -12,10 +12,12 @@ exports.register = async (username, password, email, role = "user") => {
     if (check.error) return { error: check.error };
     const request = new sql.Request();
     request.input("id", sql.VarChar, cuid());
+    request.input("userplanid", sql.VarChar, cuid());
     request.input("username", sql.VarChar(40), username);
     request.input("password", sql.VarChar(255), password);
     request.input("email", sql.VarChar(255), email);
     request.input("role", sql.VarChar(30), role);
+    request.input("plan", sql.VarChar(30), plan);
     await request
       .execute(
         `sp_register`
@@ -33,6 +35,33 @@ exports.register = async (username, password, email, role = "user") => {
     return { error: error };
   }
 };
+exports.create=async(details)=>{
+    try {
+        let data;
+        let check;
+        check = await usernameExist(details.username);
+        if (check) return { error: `${details.username} is not available` };
+        check = await emailExist(details.email);
+        if (check) return { error: `${details.email} is not available` };
+        if (check.error) return { error: check.error };
+        const request = new sql.Request();
+        request.input("id", sql.VarChar, cuid());
+        request.input("username", sql.VarChar(40), details.username);
+        request.input("password", sql.VarChar(255), details.password);
+        request.input("email", sql.VarChar(255), details.email);
+        request.input("role", sql.VarChar(30), details.role);
+        await request.query(`INSERT INTO tblusers(userId,username,password,email,role) 
+        VALUES(@id,@username,@password,@email,@role)`).then(result=>{
+            if(result.rowsAffected>0)
+            data=result.rowsAffected[0];
+        }).catch(err=>{
+            data={error:err};
+        })
+        return data;
+    } catch (error) {
+        return {error};
+    }
+}
 const usernameExist = async (username) => {
   let exist;
   const request = new sql.Request();
@@ -158,16 +187,7 @@ exports.resetPass = async (userid, newPassword) => {
     return { error: error };
   }
 };
-
-exports.recoverPassword = async (details) => {
-  try {
-    //TO DO
-    //Send recovery link to E-mail
-  } catch (error) {
-    return { error };
-  }
-};
-
+ 
 exports.profile = async (details) => {
   try {
     let data;
@@ -274,17 +294,105 @@ exports.userPlan = async (userId) => {
       .query(`SELECT * FROM tbluserplan WHERE userId=@userId `)
       .then((result) => {
         if (result.recordset.length > 0) {
-          data = result.recordset[0];
+          data = result.recordset;
         }
-      });
+      }).catch(err=>{
+        data={error:err};
+      })
       return data;
   } catch (error) {
     return { error };
   }
-};
+};      
+exports.plan=async(details)=>{
+    try {
+        let data;
+        const req = new sql.Request();
+        req.input("planId",sql.VarChar,cuid())
+        req.input("plan",sql.VarChar,details.plan.trim())
+        req.input("amount",sql.Decimal,details.amount.trim())
+        req.input("duration",sql.VarChar,details.duration.trim())
+        req.input("userId",sql.VarChar,details.userId.trim())
+        await req.query(`INSERT INTO tblplan(planId,userId,[plan],amount,duration) 
+        VALUES(@planId,@userId,@plan,@amount,@duration)`).then(result=>{
+            if(result.rowsAffected>0)
+            data= result.rowsAffected[0];
+        }).catch(err=>{
+            data={error:err};
+        })
+        return data;            
+    } catch (error) {
+        return{error};
+    }
+}
+exports.plans =async( )=>{
+    try {
+        let data;
+        const req = new sql.Request(); 
+        await req.query(`SELECT * FROM tblplan`).then(result=>{
+            if(result.recordset.length>0)
+            data = result.recordset
+        }).catch(err=>{
+            data={error:err};
+        });
+        return data;
+    } catch (error) {
+        return {error};
+    }
+}
+exports.deletePlan = async (planId) => {
+    try {
+      let data;
+      const request = new sql.Request();
+      request.input("planid", sql.VarChar(255), planId);
+      await request
+        .query(`DELETE FROM tblplan WHERE planId=@planid `)
+        .then((result) => {
+          if (result.rowsAffected>0) {
+            data = result.rowsAffected[0];
+          }
+        }).catch(err=>{
+            data={error:err}
+        })
+        return data;
+    } catch (error) {
+      return { error };
+    }
+  };
+exports.updatePlan = async (details) => {
+    try {
+      let data;
+      const request = new sql.Request();
+      request.input("planid", sql.VarChar(255), details.planId);
+      request.input("plan", sql.VarChar(60), details.plan);
+      request.input("amount", sql.Decimal, details.amount);
+      request.input("duration", sql.VarChar(10), details.duration);
+      await request
+        .query(`UPDATE tblplan SET plan=@plan, amount=@amount, duration=@duration WHERE planId=@planid `)
+        .then((result) => {
+          if (result.rowsAffected>0) {
+            data = result.recordset[0];
+          }
+        }).catch(err=>{
+            data={error:err}
+        })
+        return data;
+    } catch (error) {
+      return { error };
+    }
+  };
 exports.profileLink = async (details) => {
   try {
   } catch (error) {
     return { error };
   }
 };
+
+exports.recoverPassword = async (details) => {
+    try {
+      //TO DO
+      //Send recovery link to        E-mail
+    } catch (error) {
+      return { error };
+    }
+  };

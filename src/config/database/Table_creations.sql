@@ -78,4 +78,4 @@ id INT NOT NULL IDENTITY(1,1)
   ,CONSTRAINT FK_planUserplan FOREIGN KEY(planId) REFERENCES tblplan(planId) ON DELETE CASCADE
   ,CONSTRAINT FK_userplanUser FOREIGN KEY(userId) REFERENCES tblusers(userId) ON DELETE SET NULL
  );
-SELECT * FROM tblprofile;
+SELECT * FROM tbluserplan;

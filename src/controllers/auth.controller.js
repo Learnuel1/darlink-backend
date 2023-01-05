@@ -20,7 +20,7 @@ exports.ctrLogin =async(req,res,next)=>{
         if(!verify)
         next(APIError.unauthenticated("Incorrect password"));
         const data = responseBuilder.buildUser(exist);
-        const payload = {id:exist.userId,role:exist.Role};
+        const payload = {id:exist.userId,role:exist.role};
         const token = jwt.sign(payload,getTokenSecrete(),{expiresIn:'30m'});
         const refreshToken = jwt.sign(payload,getRefreshTokenSecrete(),{expiresIn:"60m"});
        const response  = responseBuilder.commonReponse("login successful",data,"user",{token,refreshToken});

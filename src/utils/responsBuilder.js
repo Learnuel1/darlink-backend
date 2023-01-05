@@ -16,8 +16,13 @@ const buildProfile =(profileObj)=>{
     const {id,userId,profileId,...data}=profileObj;
     return data;
 }
+const buildPlan =(planObj)=>{
+    const {id,userId,...data}=planObj;
+return data;
+}
 module.exports ={
     buildUser,
     commonReponse,
     buildProfile,
+    buildPlan,
 }

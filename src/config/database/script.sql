@@ -54,11 +54,45 @@ SET @em = ERROR_MESSAGE()
 RAISERROR(@em,16,1)
 END CATCH
 END 
+GO
 
-SELECT* from tbluserplan
+CREATE PROC sp_add_user_links
+@userId varchar(255)
+,@linkId varchar(255)
+,@type VARCHAR(10)
+,@url varchar(255)
+,@title varchar(60)
+,@subtitle varchar(120)
+,@theme VARCHAR(40)
+,@urlId VARCHAR(255)
+AS
+BEGIN
+BEGIN TRY
+BEGIN TRAN
+ IF @type ='link'
+ BEGIN
+  INSERT INTO tbllink(linkId,userId,[url], title,[type]) VALUES(@linkId,@userId,@url,@title,@type)  
+ END
+ ELSE IF @type ='section'
+ BEGIN
+  INSERT INTO tbllink(linkId,userId,theme,title,[type]) VALUES(@linkId,@userId,@theme,@title,@type)
+ END
+ ELSE IF @type = 'embed'
+ BEGIN
+  INSERT INTO tbllink(linkId,userId,[url],urlId,subtitle,[type]) VALUES(@linkId,@userId,@url,@urlId,@subtitle,@type)
+ END
+  COMMIT TRAN
+END TRY
+BEGIN CATCH
+DECLARE @em varchar(150)
+SET @em= ERROR_MESSAGE()
+RAISERROR(@em,16,1)
+END CATCH
+END
+GO
 
-SELECT * FROM tblusers u LEFT JOIN tbluserplan p ON u.userId=p.userId
 
-delete from tblusers
-select * FROM tblplan
-select * FROM tblprofile
+ 
+ 
+
+select * FROM tbllink

@@ -1,5 +1,6 @@
 const { sql } = require("../config/database");
 const cuid = require("cuid");
+const { DB_ACTIONS } = require("../config/database/action");
 
 exports.register = async (username, password, email,plan, role = "user") => {
   try {
@@ -20,7 +21,7 @@ exports.register = async (username, password, email,plan, role = "user") => {
     request.input("plan", sql.VarChar(30), plan);
     await request
       .execute(
-        `sp_register`
+        DB_ACTIONS.SP_REGISTER_USER
       )
       .then((result) => {
         if (result.rowsAffected.length > 0) {
@@ -305,6 +306,25 @@ exports.getProfile = async (userId) => {
     return { error };
   }
 };
+exports.getProfiles = async () => {
+  try {
+    let data;
+    const request = new sql.Request(); 
+    await request
+      .query(`SELECT * FROM tblprofile`)
+      .then((result) => {
+        if (result.recordset.length > 0) {
+          data = result.recordset;
+        }
+      })
+      .catch((err) => {
+        data = { error: err };
+      });
+    return data;
+  } catch (error) {
+    return { error };
+  }
+};
 exports.userPlan = async (userId) => {
   try {
     let data;
@@ -394,7 +414,7 @@ exports.updatePlan = async (details) => {
       request.input("amount", sql.Decimal, amount);
       request.input("duration", sql.VarChar(10), duration);
       await request
-        .execute(`sp_update_plan`)
+        .execute(DB_ACTIONS.SP_ADMIN_UPDATE_PLAN)
         .then((result) => {
           if (result.rowsAffected.length>0) {
             data = result.rowsAffected[0];
@@ -410,10 +430,75 @@ exports.updatePlan = async (details) => {
 
 exports.profileLink = async (details) => {
   try {
+   let url,urlId,title,subtitle,theme,data;
+
+   if(details.url)
+   url=details.url
+   if(details.urlId)
+   urlId=details.urlId
+   if(details.title)
+   title=details.title
+   if(details.theme)
+   theme=details.theme
+   if(details.subtitle)
+   subtitle=details.subtitle
+
+   console.log(details)
+   const request= new sql.Request();
+   request.input("linkId",sql.VarChar(255),cuid())
+   request.input("userId",sql.VarChar(255),details.userId)
+   request.input("url",sql.VarChar(255),url)
+   request.input("urlId",sql.VarChar(255),urlId)
+   request.input("title",sql.VarChar(60),title)
+   request.input("theme",sql.VarChar(40),theme)
+   request.input("subtitle",sql.VarChar(120),subtitle)
+   request.input("type",sql.VarChar(10),details.type.toLowerCase())
+   await request.execute(DB_ACTIONS.SP_ADD_LINK).then(result=>{
+    console.log(result)
+    if(result.rowsAffected>0)
+    data=result.rowsAffected[0];
+   }).catch(err=>{
+    data={error:err};
+    console.log(err)
+   })
+   return data;
   } catch (error) {
     return { error };
   }
 };
+exports.links =async( userId)=>{
+    try {
+        let data;
+        const req = new sql.Request(); 
+        req.input("userId",sql.VarChar(255),userId)
+        await req.query(`SELECT * FROM tbllink WHERE userId=@userId`).then(result=>{
+            if(result.recordset.length>0)
+            data = result.recordset
+        }).catch(err=>{
+            data={error:err};
+        });
+        return data;
+    } catch (error) {
+        return {error};
+    }
+}
+exports.removeLinks =async( userId,linkId)=>{
+    try {
+        let data;
+        const req = new sql.Request(); 
+        req.input("userId",sql.VarChar(255),userId)
+        req.input("linkId",sql.VarChar(255),linkId)
+        await req.query(`DELETE FROM tbllink WHERE userId=@userId AND linkId=@linkId`).then(result=>{
+            if(result.rowsAffected>0)
+            data = result.rowsAffected[0]
+        }).catch(err=>{
+            data={error:err};
+        });
+        return data;
+    } catch (error) {
+        return {error};
+    }
+}
 
 exports.recoverPassword = async (details) => {
     try {

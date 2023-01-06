@@ -4,3 +4,10 @@ exports.ACTIONS ={
     DEFAULT_PLAN:'Beginner',
     MESSAGE:'msg',
 }
+
+exports.PLANS={
+     BEGINNER:'beginner',
+     PERSONAL:'personal',
+     PROFESSIONAL:'professional',
+     ENTREPRENEUR:'entrepreneur',
+}

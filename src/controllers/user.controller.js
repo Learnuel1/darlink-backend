@@ -8,12 +8,16 @@ const { registerUser,
     getPlans, 
     getUserPlan,
     deletePlan,
-    updatePlan} = require("../services");
+    updatePlan,
+    getUserProfiles,
+    userProfileLink,
+    getUserLinks,
+    removeUserLinks} = require("../services");
 const { APIError } = require("../utils/apiError");
 const { isValidEmail } = require("../utils/validation");
 const responseBuilder = require('../utils/responsBuilder');
 const { cloudinary, accessPath } = require("../utils/cloudinary");
-const { ACTIONS } = require("../utils/actions"); 
+const { ACTIONS, PLANS } = require("../utils/actions"); 
 exports.ctrRegister =async(req,res,next)=>{
     try{
         const {username,password,email}=req.body;
@@ -161,6 +165,27 @@ exports.ctlGetProfile=async(req,res,next)=>{
         next(error);
     }
 }
+exports.ctlGetProfiles=async(req,res,next)=>{
+    try {
+        
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        if(req.userRole)
+        return next(APIError.unauthorized());
+        const profile = await getUserProfiles();
+        if(!profile)
+        return next(APIError.customError("user does not exist",404));
+        if(profile.error)
+        return next(APIError.customError(profile.error,400));
+        const data= profile.map((item)=>{
+            return responseBuilder.buildProfile(item)
+        }) 
+           const response = responseBuilder.commonReponse("Found",data,"profile");
+           res.status(200).json(response);
+    } catch (error) {
+        next(error);
+    }
+}
 exports.ctrlPlan=async(req,res,next)=>{
     try {
         const {plan,amount,duration}=req.body;
@@ -266,6 +291,88 @@ exports.ctrlUpdatePlan=async(req,res,next)=>{
         next(error);
     }
 }
+exports.ctrlLink = async(req, res, next) => {
+    try {
+         
+        const details={type}=req.body;
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        if(!req.plan)
+        return next(APIError.unauthorized(`Updgrade plan to have access`))
+        const plan = req.plan
+        if(!type)
+        return next(APIError.badRequest("Type is required"));
+        details.type=type;
+        details.userId=req.userId;
+        for(key in req.body){
+            if(key.toLowerCase() !=='dataFile')
+            details[key] = req.body[key];
+        }
+        if(details.subtitle){
+            if(plan.toLowerCase() !==PLANS.PERSONAL || plan.toLowerCase() !==PLANS.ENTREPRENEUR)
+            return next(APIError.unauthorized(`Updgrade plan to ${PLANS.ENTREPRENEUR} to have access`));
+        }
+        if(req.body.dataFile){
+            //send file to cloude
+             if(req.body.bgImage){
+            const img=await    cloudinary.uploader.upload(req.body.dataFile,{
+                upload_preset:accessPath.preset(),
+                folder:accessPath.folder()
+            })
+            details.url=img.public_id;
+            details.urlId=img.secure_url;
+        }
+        }
+
+        const userLink = await userProfileLink(details);
+        if(!userLink)
+        return  next(APIError.customError("No user infor found"));
+
+        if(userLink.error)
+        return next(APIError.customError(userLink.error,400));
+         res.status(201).json({success:true,mdg:"Data recorded successfully"});
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+exports.ctrlGetLinks = async(req, res, next) => {
+    try {
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        const userLinks= await getUserLinks(req.userId);
+        if(!userLinks)
+        return next(APIError.customError('No user link found',404));
+        if(userLinks.error)
+        return next(APIError.customError(userLinks.error,400));
+        const data = userLinks.map((cur)=>{
+            return responseBuilder.buildPlan(cur);
+        })
+        const response = responseBuilder.commonReponse("Found",data,"Link");
+        res.status(200).json(response)
+    } catch (error) {
+        next(error);
+    }
+}
+exports.ctrlRemoveLinks = async(req, res, next) => {
+    try {
+        const {linkId} = req.query;
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        if(!linkId)
+        return next(APIError.badRequest("LinkId is required"));
+        const userLinks= await removeUserLinks(req.userId,linkId);
+        if(!userLinks)
+        return next(APIError.customError('Link Id does not exist',404));
+        if(userLinks.error)
+        return next(APIError.customError(userLinks.error,400));
+        res.status(200).json({success:true,msg:'Delete completed successfully'})
+    } catch (error) {
+        next(error);
+    }
+}
+
 exports.ctrlSendRecoverMail=async(req,res,next)=>{
     try {
         //TO DO

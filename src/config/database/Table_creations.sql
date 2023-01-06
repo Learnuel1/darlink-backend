@@ -36,11 +36,11 @@ CREATE TABLE tbllink(
 id INT NOT NULL IDENTITY(1,1)
 ,linkId varchar(255) NOT NULL
 ,userId varchar(255) NOT NULL
-,url varchar(255) NOT NULL
-,title varchar(60) NOT NULL
+,[url] varchar(255) NOT NULL
+,title varchar(60)  NULL
+,theme VARCHAR(40) NULL
 ,subtitle varchar(120) NULL
-,thumbnailId varchar(255) NULL
-,thumbnailUrl varchar(255) NULL
+,urlId varchar(255) NULL 
 ,[type] varchar(20) NOT NULL CHECK([type] IN('link','section','embed'))
  ,createdAt DATETIME NOT NULL DEFAULT GETDATE()
  ,updatedAt DATETIME NOT NULL DEFAULT GETDATE()

@@ -43,7 +43,7 @@ const userRequired =async(req,res,next)=>{
 }
  const userPlanRequired = async(req,res,next)=>{
     try {
-        if(req.userId)
+        if(!req.userId)
         return next(APIError.unauthenticated());
         const user = await getUserPlan(req.userId);
         if(!user)

@@ -2,7 +2,7 @@ const { getTokenSecrete } = require("../config/env");
 const { APIError } = require("../utils/apiError");
 const jwt = require("jsonwebtoken");
 const { userExist, getUserPlan } = require("../services");
-const { ACTIONS } = require("../utils/actions");
+const { ACTIONS, ERROR_FIELD } = require("../utils/actions");
 
 const adminRequired=(req,res,next)=>{
     try{
@@ -17,7 +17,7 @@ const adminRequired=(req,res,next)=>{
         next();
     }catch(error){
         if( error.message ===ACTIONS.JWT_EXPIRED)
-        next(APIError.customError('session expired',400))
+        next(APIError.unauthenticated())
     next(error);
     }
 }
@@ -37,7 +37,7 @@ const userRequired =async(req,res,next)=>{
         next();
     }catch(error){
         if( error.message ===ACTIONS.JWT_EXPIRED)
-        next(APIError.customError('session expired',400))
+        next(APIError.unauthenticated())
        else next(error);
     }
 }

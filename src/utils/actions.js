@@ -3,6 +3,12 @@ exports.ACTIONS ={
     JWT_EXPIRED:'jwt expired',
     DEFAULT_PLAN:'Beginner',
     MESSAGE:'msg',
+    SOCIAL: 'social',
+    PODCAST: "podcast",
+    MUSIC: "music",
+    CONTACT: "contact",
+    EMAIL: "email",
+    COMPLETED: {success:true, msg:'Operation Successful'},
 }
 
 exports.PLANS={
@@ -10,4 +16,10 @@ exports.PLANS={
      PERSONAL:'personal',
      PROFESSIONAL:'professional',
      ENTREPRENEUR:'entrepreneur',
+}
+
+exports.ERROR_FIELD={
+    INVALID_EMAIL:"Email is Invalid",
+    JWT_EXPIRED:'jwt expired',
+    NOT_FOUND: "No Record Found",
 }

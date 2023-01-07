@@ -334,7 +334,7 @@ exports.userPlan = async (userId) => {
       .query(`SELECT * FROM tbluserplan WHERE userId=@userId `)
       .then((result) => {
         if (result.recordset.length > 0) {
-          data = result.recordset;
+          data = result.recordset[0];
         }
       }).catch(err=>{
         data={error:err};
@@ -500,6 +500,60 @@ exports.removeLinks =async( userId,linkId)=>{
     }
 }
 
+exports.button = async(details) => {
+  try{
+    let data,dataId;
+    if(details.dataId)
+    dataId= details.dataId;
+    const request = new sql.Request();
+    request.input('userId', sql.VarChar(255), details.userId);
+    request.input("buttonId", sql.VarChar(255), cuid());
+    request.input("type", sql.VarChar(20), details.type);
+    request.input("data", sql.VarChar(255), details.data);
+    request.input("dataId", sql.VarChar(255), dataId);
+    await request.execute(DB_ACTIONS.SP_ADD_USER_BUTTON).then(result => {
+      if (result.rowsAffected > 0)
+        data = result.rowsAffected[0];
+    }).catch(err => {
+      data = { error: err }
+    })
+    return data;
+  } catch (error) {
+    return { error };
+  }
+}
+exports.userButton = async(userId) => {
+  try{
+    let data;
+    const request = new sql.Request();
+    request.input('userId', sql.VarChar(255), userId);
+    await request.query(`SELECT * FROM tblbutton WHERE userId=@userId`).then(result => {
+      if (result.recordset.length > 0)
+        data = result.recordset;
+    }).catch(err => {
+      data = { error: err }
+    })
+    return data;
+  } catch (error) {
+    return { error };
+  }
+}
+exports.removeButton = async(userId) => {
+  try{
+    let data;
+    const request = new sql.Request();
+    request.input('userId', sql.VarChar(255), userId);
+    await request.query(`DELETE FROM tblbutton WHERE userId=@userId`).then(result => {
+      if (result.rowsAffected > 0)
+        data = result.rowsAffected[0];
+    }).catch(err => {
+      data = { error: err }
+    })
+    return data;
+  } catch (error) {
+    return { error };
+  }
+}
 exports.recoverPassword = async (details) => {
     try {
       //TO DO

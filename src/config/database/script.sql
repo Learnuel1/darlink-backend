@@ -91,8 +91,40 @@ END CATCH
 END
 GO
 
-
+alter PROC sp_add_user_button
+@userId VARCHAR(255)
+,@buttonId VARCHAR(255)
+,@type VARCHAR(20)
+,@data VARCHAR(255)
+,@dataId VARCHAR(255)
+AS
+BEGIN
+BEGIN TRY
+BEGIN TRAN
+IF LOWER(@type) = 'contact' OR LOWER(@type) = 'social' OR LOWER(@type) = 'podcast'
+BEGIN
+INSERT INTO tblbutton(buttonId, [data],[type], userId) VALUES(@buttonId, @data,@type,@userId)
+END
+ELSE IF LOWER(@type) = 'music'
+BEGIN
+INSERT INTO tblbutton(buttonId,[data],dataId,[type], userId) VALUES(@buttonId,@data,@dataId,@type,@userId)
+END
+ELSE IF LOWER(@type) = 'email'
+BEGIN
+INSERT INTO tblbutton(buttonId,[data],[type], userId) 
+VALUES(@buttonId,@data,@type,@userId)
+END
+ELSE
+RAISERROR('No button type found',16,1)
+COMMIT TRAN
+END TRY
+BEGIN CATCH
+ROLLBACK TRAN
+DECLARE @em VARCHAR(150)
+SET @em = ERROR_MESSAGE()
+RAISERROR(@em,16,1)
+END CATCH
+END
+GO
  
- 
-
-select * FROM tbllink
+  select * FROM tblbutton

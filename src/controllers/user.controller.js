@@ -12,12 +12,15 @@ const { registerUser,
     getUserProfiles,
     userProfileLink,
     getUserLinks,
-    removeUserLinks} = require("../services");
+    removeUserLinks,
+    userButton,
+    getUserButton,
+    removeUserButton} = require("../services");
 const { APIError } = require("../utils/apiError");
 const { isValidEmail } = require("../utils/validation");
 const responseBuilder = require('../utils/responsBuilder');
 const { cloudinary, accessPath } = require("../utils/cloudinary");
-const { ACTIONS, PLANS } = require("../utils/actions"); 
+const { ACTIONS, PLANS, ERROR_FIELD } = require("../utils/actions"); 
 exports.ctrRegister =async(req,res,next)=>{
     try{
         const {username,password,email}=req.body;
@@ -28,7 +31,7 @@ exports.ctrRegister =async(req,res,next)=>{
         if(!email)
         next(APIError.badRequest('email is required'));
         if(!isValidEmail(email))
-        next(APIError.badRequest("email is invalid"));
+        next(APIError.badRequest(ERROR_FIELD.INVALID_EMAIL));
         const hashedPass = hashSync(password.trim(),12);
         const register = await registerUser(username.trim(),hashedPass,email.trim(),ACTIONS.DEFAULT_PLAN);
         if(!register)
@@ -52,7 +55,7 @@ exports.ctrCreate =async(req,res,next)=>{
         if(!role)
         next(APIError.badRequest('Role is required'));
         if(!isValidEmail(email))
-        next(APIError.badRequest("Email is invalid"));
+        next(APIError.badRequest(ERROR_FIELD.INVALID_EMAIL));
         const hashedPass = hashSync(password.trim(),12);
         const details ={username,password:hashedPass,email,role}
         const register = await createAdmin(details);
@@ -78,7 +81,7 @@ exports.ctrlFindUser=async(req,res,next)=>{
         }
         if(data.email){
             if(!isValidEmail(data.email))
-            return next(APIError.customError("Invalid email",400));
+            return next(APIError.customError(ERROR_FIELD.INVALID_EMAIL,400));
         }
         if(data.username){
             const useExist = await findUserAccount(data);
@@ -372,7 +375,85 @@ exports.ctrlRemoveLinks = async(req, res, next) => {
         next(error);
     }
 }
+exports.ctrlButton = async (req, res, next) => {
+    try {
+        const {type} = req.body;
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        if(!req.plan)
+        return next(APIError.unauthorized());
+        if(!type)
+        return next(APIError.badRequest("Type is required"));
 
+        const details = {};
+        for(key in req.body){
+            details[key] = req.body[key];
+        }
+        if(details.length===0)
+        return next(APIError.badRequest())
+        const check=type.toLowerCase();
+        const plan=req.plan.toLowerCase();
+        details.userId=req.userId;
+        if(check === ACTIONS.EMAIL){
+             if(!isValidEmail(details.data))
+        next(APIError.badRequest(ERROR_FIELD.INVALID_EMAIL));
+        }
+        if(check === ACTIONS.SOCIAL || 
+        check === ACTIONS.MUSIC || 
+        check === ACTIONS.PODCAST || 
+        check === ACTIONS.CONTACT)
+        if(
+        plan !== PLANS.PERSONAL ||
+         plan !== PLANS.ENTREPRENEUR){
+            infor =  PLANS.PERSONAL.charAt(0).toUpperCase() + PLANS.PERSONAL.slice(1);
+            return next(APIError.unauthenticated(`Upgrade plan to ${infor} Plan`))
+        }
+        details.type=check;
+        details.plan=plan;
+
+    const button = await userButton(details);
+    if(!button)
+    return next(APIError.customError(ERROR_FIELD.NOT_FOUND,404))
+    if(button.error)
+    return next(APIError.customError(button.error,400));
+    res.status(201).json(ACTIONS.COMPLETED);
+    } catch (error) {
+        next(error);
+    }
+}
+
+exports.ctrlGetButton = async (req, res, next) => {
+    try {
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        const button = await getUserButton(req.userId);
+        if(!button)
+        return next(APIError.customError(ERROR_FIELD.NOT_FOUND,404))
+        if(button.error)
+        return next(APIError.customError(button.error,400));
+        const data= button.map((cur)=>{
+            return responseBuilder.buildPlan(cur);
+        })
+    const response = responseBuilder.commonReponse("Found",data,"button");
+    res.status(200).json(response);
+    } catch (error) {
+        next(error);
+    }
+}
+exports.ctrlRemoveButton = async (req, res, next) => {
+    try {
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        const button = await removeUserButton(req.userId);
+        if(!button)
+        return next(APIError.customError(ERROR_FIELD.NOT_FOUND,404))
+        if(button.error)
+        return next(APIError.customError(button.error,400));
+    res.status(200).json(ACTIONS.COMPLETED);
+    } catch (error) {
+        next(error);
+    }
+}
 exports.ctrlSendRecoverMail=async(req,res,next)=>{
     try {
         //TO DO

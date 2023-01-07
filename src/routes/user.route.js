@@ -13,6 +13,9 @@ userRoute.get('/',Controller.userControl.ctrlGetPlans)
 userRoute.post('/resources',userRequired,userPlanRequired,Controller.userControl.ctrlLink)
 userRoute.get('/resources',userRequired,Controller.userControl.ctrlGetLinks)
 userRoute.delete('/resources',userRequired,Controller.userControl.ctrlRemoveLinks)
+userRoute.post("/button",userRequired, userPlanRequired, Controller.userControl.ctrlButton)
+userRoute.get("/button",userRequired, Controller.userControl.ctrlGetButton)
+userRoute.delete("/button",userRequired, Controller.userControl.ctrlRemoveButton)
 
 
 userRoute.use("*",errorMiddleWareModule.notFound);

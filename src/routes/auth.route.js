@@ -6,7 +6,7 @@ const { userRequired, adminRequired } = require('../middlewares/auth.middleware'
 const authRoute=express.Router();
 
 authRoute.post('/register', Controller.userControl.ctrRegister);
-authRoute.post('/create', Controller.userControl.ctrCreate);
+authRoute.post('/create',adminRequired, Controller.userControl.ctrCreate);
 authRoute.post('/login', Controller.AuthControl.ctrLogin);
 authRoute.post('/logout',Controller.AuthControl.ctrLogout);
 authRoute.patch('/reset',userRequired,Controller.AuthControl.ctrlResetLogin);

@@ -20,8 +20,10 @@ This is the backend API Server for the Darlink User and Admin dashboards.
 3. Update the `.env with the appropriate values.
 4. Install `mssql` and `msnodesqlv8` drivers using `npm i mssql -save` and `npm i msnodesqlv8` respectively.
 5. Goto `src/config/database/index.js` and update the  `server` field with the instance of your `SQL server instance`.
-6. Use `npm run dev` to run the server locally
+6. In the `database` folder : `copy` the content of `Table_creations.sql` and `script.sql` and execute in your `SQL SERVER`respectively.
+7. Use `npm run dev` to run the server locally
 
+### API DOC 
 
 
 ## APPLICATION DESCRIPTION

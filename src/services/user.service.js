@@ -443,7 +443,6 @@ exports.profileLink = async (details) => {
    if(details.subtitle)
    subtitle=details.subtitle
 
-   console.log(details)
    const request= new sql.Request();
    request.input("linkId",sql.VarChar(255),cuid())
    request.input("userId",sql.VarChar(255),details.userId)
@@ -454,12 +453,10 @@ exports.profileLink = async (details) => {
    request.input("subtitle",sql.VarChar(120),subtitle)
    request.input("type",sql.VarChar(10),details.type.toLowerCase())
    await request.execute(DB_ACTIONS.SP_ADD_LINK).then(result=>{
-    console.log(result)
     if(result.rowsAffected>0)
     data=result.rowsAffected[0];
    }).catch(err=>{
     data={error:err};
-    console.log(err)
    })
    return data;
   } catch (error) {

@@ -24,7 +24,7 @@ This is the backend API Server for the Darlink User and Admin dashboards.
 7. Use `npm run dev` to run the server locally
 
 ### API DOC 
-`https://darlink-backend.vercel.app`
+https://darlink-backend.vercel.app
 
 ## APPLICATION DESCRIPTION
 

@@ -23,3 +23,6 @@ exports.updatePlan = async (details) => UserModule.updatePlan(details);
 exports.userProfileLink = async (details) => UserModule.profileLink(details);
 exports.getUserLinks = async (userId) => UserModule.links(userId);
 exports.removeUserLinks = async (userId,linkId) => UserModule.removeLinks(userId,linkId);
+exports.userButton = async (details) => UserModule.button(details);
+exports.getUserButton = async (userId) => UserModule.userButton(userId);
+exports.removeUserButton = async (userId) => UserModule.removeButton(userId);

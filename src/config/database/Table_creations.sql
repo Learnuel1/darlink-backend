@@ -78,4 +78,19 @@ id INT NOT NULL IDENTITY(1,1)
   ,CONSTRAINT FK_planUserplan FOREIGN KEY(planId) REFERENCES tblplan(planId) ON DELETE CASCADE
   ,CONSTRAINT FK_userplanUser FOREIGN KEY(userId) REFERENCES tblusers(userId) ON DELETE SET NULL
  );
+
+GO
+CREATE TABLE tblbutton(
+    id INT NOT NULL IDENTITY(1,1)
+    ,buttonId VARCHAR(255) NOT NULL
+    ,[type] VARCHAR(20) NOT NULL CHECK([type] IN ('email','discord','telegram','social','music','contact','podcast'))
+    ,[data] VARCHAR(255) NOT NULL
+    ,dataId VARCHAR(255) NULL
+    ,userId VARCHAR(255) NOT NULL
+    ,createdAt DATETIME NOT NULL DEFAULT GETDATE()
+    ,updatedAt DATETIME NOT NULL DEFAULT GETDATE()
+    ,CONSTRAINT PK_button PRIMARY KEY(buttonId)
+    ,CONSTRAINT FK_buttonUser FOREIGN KEY(userId) REFERENCES tblusers(userId) ON DELETE CASCADE
+);
+GO
 SELECT * FROM tbluserplan;

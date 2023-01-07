@@ -310,8 +310,11 @@ exports.ctrlLink = async(req, res, next) => {
             details[key] = req.body[key];
         }
         if(details.subtitle){
-            if(plan.toLowerCase() !==PLANS.PERSONAL || plan.toLowerCase() !==PLANS.ENTREPRENEUR)
-            return next(APIError.unauthorized(`Updgrade plan to ${PLANS.ENTREPRENEUR} to have access`));
+            if(plan.toLowerCase() !==PLANS.PERSONAL || plan.toLowerCase() !==PLANS.ENTREPRENEUR){
+
+            const infor = PLANS.ENTREPRENEUR.charAt(0).toUpperCase() + PLANS.ENTREPRENEUR.slice(1);
+            return next(APIError.unauthorized(`Updgrade to ${infor} Plan to have access`));
+            }
         }
         if(req.body.dataFile){
             //send file to cloude
@@ -331,7 +334,7 @@ exports.ctrlLink = async(req, res, next) => {
 
         if(userLink.error)
         return next(APIError.customError(userLink.error,400));
-         res.status(201).json({success:true,mdg:"Data recorded successfully"});
+         res.status(201).json(ACTIONS.COMPLETED);
 
     } catch (error) {
         next(error);

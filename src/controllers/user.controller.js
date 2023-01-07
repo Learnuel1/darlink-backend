@@ -173,7 +173,7 @@ exports.ctlGetProfiles=async(req,res,next)=>{
         
         if(!req.userId)
         return next(APIError.unauthenticated());
-        if(req.userRole)
+        if(!req.userRole)
         return next(APIError.unauthorized());
         const profile = await getUserProfiles();
         if(!profile)
@@ -235,14 +235,12 @@ exports.ctrlGetUserPlans=async(req,res,next)=>{
     if(!req.userId)
     return next(APIError.unauthenticated());
 
-    const plans = await getUserPlan(req.userId)
-    if(!plans)
+    const plan = await getUserPlan(req.userId)
+    if(!plan)
     return next(APIError.customError("No plan exist for this account",404));
-    if(plans.error)
-    return next(APIError.customError(plans.error,400));
-    const data = plans.map((item)=>{
-        return responseBuilder.buildPlan(item);
-    })
+    if(plan.error)
+    return next(APIError.customError(plan.error,400));
+    const data= responseBuilder.buildPlan(plan);
     const response= responseBuilder.commonReponse("Found",data,"plans");
     res.status(200).json(response);
     } catch (error) {

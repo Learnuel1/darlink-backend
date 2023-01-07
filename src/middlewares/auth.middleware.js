@@ -47,7 +47,7 @@ const userRequired =async(req,res,next)=>{
         return next(APIError.unauthenticated());
         const user = await getUserPlan(req.userId);
         if(!user)
-        return next(APIError.customError("User plan was not fund"))
+        return next(APIError.customError("User plan was not found",404))
         if(user.error)
         return next(APIError.customError(user.error,400));
         req.plan=user.plan

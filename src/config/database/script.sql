@@ -91,7 +91,7 @@ END CATCH
 END
 GO
 
-alter PROC sp_add_user_button
+CREATE PROC sp_add_user_button
 @userId VARCHAR(255)
 ,@buttonId VARCHAR(255)
 ,@type VARCHAR(20)
@@ -127,4 +127,3 @@ END CATCH
 END
 GO
  
-  select * FROM tblbutton

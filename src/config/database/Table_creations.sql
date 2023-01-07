@@ -1,4 +1,4 @@
-DROP TABLE  tblusers;
+
 GO
 CREATE TABLE tblusers(
     id INT NOT NULL IDENTITY(1,1)
@@ -93,4 +93,3 @@ CREATE TABLE tblbutton(
     ,CONSTRAINT FK_buttonUser FOREIGN KEY(userId) REFERENCES tblusers(userId) ON DELETE CASCADE
 );
 GO
-SELECT * FROM tbluserplan;

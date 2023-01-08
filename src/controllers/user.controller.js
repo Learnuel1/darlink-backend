@@ -15,12 +15,14 @@ const { registerUser,
     removeUserLinks,
     userButton,
     getUserButton,
-    removeUserButton} = require("../services");
+    removeUserButton,
+    sendRecoverMail} = require("../services");
 const { APIError } = require("../utils/apiError");
 const { isValidEmail } = require("../utils/validation");
 const responseBuilder = require('../utils/responsBuilder');
 const { cloudinary, accessPath } = require("../utils/cloudinary");
 const { ACTIONS, PLANS, ERROR_FIELD } = require("../utils/actions"); 
+const { recoveryPasswordMailHandler } = require("../utils/mailer");
 exports.ctrRegister =async(req,res,next)=>{
     try{
         const {username,password,email}=req.body;
@@ -459,6 +461,15 @@ exports.ctrlSendRecoverMail=async(req,res,next)=>{
     try {
         //TO DO
         //send recovery mail
+        if(!req.mail)
+        return next(APIError.badRequest("Account not Found"));
+        const temPass ="dljperkladf";
+        recoveryPasswordMailHandler(req.email,temPass).then(async response=>{
+          const details= {email:req.mail};
+            const newPass = await sendRecoverMail(details);
+        }).catch(err=>{
+
+        })
     } catch (error) {
         next(error);
     }

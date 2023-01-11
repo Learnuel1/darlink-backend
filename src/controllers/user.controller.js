@@ -34,6 +34,7 @@ exports.ctrRegister =async(req,res,next)=>{
         next(APIError.badRequest('email is required'));
         if(!isValidEmail(email))
         next(APIError.badRequest(ERROR_FIELD.INVALID_EMAIL));
+
         const hashedPass = hashSync(password.trim(),12);
         const register = await registerUser(username.trim(),hashedPass,email.trim(),ACTIONS.DEFAULT_PLAN);
         if(!register)
@@ -57,7 +58,7 @@ exports.ctrCreate =async(req,res,next)=>{
         if(!role)
         next(APIError.badRequest('Role is required'));
         if(!isValidEmail(email))
-        next(APIError.badRequest(ERROR_FIELD.INVALID_EMAIL));
+        next(APIError.badRequest(ERROR_FIELD.INVALID_EMAIL,400));
         const hashedPass = hashSync(password.trim(),12);
         const details ={username,password:hashedPass,email,role}
         const register = await createAdmin(details);

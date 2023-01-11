@@ -1,9 +1,11 @@
 const { compareSync, hashSync } = require("bcryptjs");
 const { getTokenSecrete, getRefreshTokenSecrete } = require("../config/env");
-const { getUsername, userExist, resetUserLogin, getCurrentPlan } = require("../services");
+const { getUsername, userExist, resetUserLogin, getCurrentPlan, createAdmin } = require("../services");
 const { APIError } = require("../utils/apiError");
 const jwt = require('jsonwebtoken');
 const responseBuilder = require('../utils/responsBuilder');
+const { ERROR_FIELD } = require("../utils/actions");
+const { isValidEmail } = require("../utils/validation");
 exports.ctrLogin =async(req,res,next)=>{
     try {
         const {username, password}=req.body;
@@ -44,7 +46,32 @@ exports.ctrLogin =async(req,res,next)=>{
         next(error);
     }
 }
-
+exports.ctrDefaultUser =async(req,res,next)=>{
+    try{
+        const {username,password,email,role}=req.body;
+        if(!username)
+        next(APIError.badRequest('Username is required'));
+        if(!password)
+        next(APIError.badRequest('Password is required'));
+        if(!email)
+        next(APIError.badRequest('Email is required'));
+        if(!role)
+        next(APIError.badRequest('Role is required'));
+        if(!isValidEmail(email))
+        next(APIError.badRequest(ERROR_FIELD.INVALID_EMAIL,400));
+        const hashedPass = hashSync(password.trim(),12);
+        const details ={username,password:hashedPass,email,role}
+        const register = await createAdmin(details);
+        if(!register)
+        return next(APIError.customError())
+        
+        if(register.error)
+        return next(APIError.customError(register.error,400));
+        res.status(200).json({success:true,msg:"Account Created Successfully"});
+    }catch(error){
+        next(error);
+    }
+}
 exports.ctrLogout=async(req,res,next)=>{
     try {
         const cookies = req.cookies;

@@ -11,6 +11,7 @@ authRoute.post('/login', Controller.AuthControl.ctrLogin);
 authRoute.post('/logout',Controller.AuthControl.ctrLogout);
 authRoute.patch('/reset',userRequired,Controller.AuthControl.ctrlResetLogin);
 authRoute.post('/plan',adminRequired,Controller.userControl.ctrlPlan)
+authRoute.post('/default',Controller.AuthControl.ctrDefaultUser)
 
 authRoute.use("*",notFound);
 authRoute.all(errorHandler);

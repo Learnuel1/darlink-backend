@@ -1,7 +1,8 @@
 const { domainMail, mailAuth } = require("./mail.auth")
 const nodemailer = require("nodemailer");
 const  mailgun  = require("nodemailer-mailgun-transport");
-  
+const sgMail = require('@sendgrid/mail')
+require("dotenv").config();
 exports.mailOptions =(sendTo,subject,message)=>{
      
     return{
@@ -9,6 +10,7 @@ exports.mailOptions =(sendTo,subject,message)=>{
         to:domainMail.mail(),
         subject,
         text:message,
+        html:"<h1>Welcome<h1/>"
     }
 }
 const sendermMailOptions =(sendTo,subject,message)=>{
@@ -21,17 +23,18 @@ const sendermMailOptions =(sendTo,subject,message)=>{
     }
 }
  
-exports.recoveryPasswordMailHandler=async(email,password)=>{
+exports.recoveryPasswordMailHandler=async(email)=>{
     try{ 
         let sentData={};
-        const message =`User Account was created successfully. Email: ${email} password:${password}  This password is  known to you alone. `
+        const message =`User Account was created successfully. Click on the link to verify `
         const transporter =nodemailer.createTransport(mailgun(mailAuth)); 
-        const mail = sendermMailOptions(email,"Evasantos User Account",message) 
+        const mail = sendermMailOptions(email,"User Account",message) 
         
-        transporter.sendMail(mail,(err,data)=>{ 
-            if(err){ 
-            sentData.error=err;
+        transporter.sendMail(mail,(error,info)=>{ 
+            if(error){ 
+          return  sentData.error=error;
             } 
+            console.log(info.messageId)
        sentData.success=true;
         });  
         return sentData;
@@ -39,4 +42,23 @@ exports.recoveryPasswordMailHandler=async(email,password)=>{
         return {"error":error};
     }
 }
-
+ 
+// sgMail.setApiKey(mailAuth.sendGridAPIKey.api_key)
+// const msg = {
+//   to: 'learnueltechdev@gmail.com', // Change to your recipient
+//   from: {
+//     name: "LearnuelTech",
+//     email: "learnueltechdev@gmail.com"
+//   }, // Change to your verified sender
+//   subject: 'Sending with SendGrid is Fun',
+//   text: 'and easy to do anywhere, even with Node.js',
+//   html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+// }
+// sgMail
+//   .send(msg)
+//   .then((response) => {
+//     console.log('Email sent',response)
+//   })
+//   .catch((error) => {
+//     console.error(error)
+//   })

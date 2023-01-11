@@ -4,6 +4,9 @@ exports.mailAuth={
 auth:{
     api_key: process.env.MAIL_API_KEY,
     domain: process.env.MAIL_DOMAIN,
+},
+sendGridAPIKey:{
+    api_key:process.env.SENDGRID_API_KEY
 }
 }
 

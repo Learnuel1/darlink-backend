@@ -1,6 +1,6 @@
 const { compareSync, hashSync } = require("bcryptjs");
 const { getTokenSecrete, getRefreshTokenSecrete } = require("../config/env");
-const { getUsername, userExist, resetUserLogin, getCurrentPlan, createAdmin } = require("../services");
+const { getUsername, userExist, resetUserLogin, getCurrentPlan, createAdmin, defaultAccount } = require("../services");
 const { APIError } = require("../utils/apiError");
 const jwt = require('jsonwebtoken');
 const responseBuilder = require('../utils/responsBuilder');
@@ -61,7 +61,7 @@ exports.ctrDefaultUser =async(req,res,next)=>{
         next(APIError.badRequest(ERROR_FIELD.INVALID_EMAIL,400));
         const hashedPass = hashSync(password.trim(),12);
         const details ={username,password:hashedPass,email,role}
-        const register = await createAdmin(details);
+        const register = await defaultAccount(details);
         if(!register)
         return next(APIError.customError())
         

@@ -29,8 +29,33 @@ CREATE PROC sp_register
  RAISERROR(@em,16,1)
  END CATCH
  END
-
 GO
+CREATE PROC sp_default_admin
+@id varchar(255)
+,@username varchar(60)
+,@password varchar(255)
+,@email varchar(255)
+,@role varchar(255)
+ AS
+ BEGIN
+ BEGIN TRY
+ BEGIN TRAN
+ IF(SELECT COUNT(userId) FROM tblusers)>0
+  RAISERROR('Access denied, login required',16,1)
+
+ INSERT INTO tblusers(userId,username,password,email,role)
+ VALUES(@id,@username,@password,@email,@role)
+ COMMIT TRAN
+ END TRY
+ BEGIN CATCH
+ ROLLBACK TRAN
+ DECLARE @em varchar(150)
+ SET @em = ERROR_MESSAGE()
+ RAISERROR(@em,16,1)
+ END CATCH
+ END
+GO
+
 CREATE PROC sp_update_plan
 @planId VARCHAR(255)
 ,@plans VARCHAR(60)

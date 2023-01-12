@@ -26,3 +26,4 @@ exports.removeUserLinks = async (userId,linkId) => UserModule.removeLinks(userId
 exports.userButton = async (details) => UserModule.button(details);
 exports.getUserButton = async (userId) => UserModule.userButton(userId);
 exports.removeUserButton = async (userId) => UserModule.removeButton(userId);
+exports.defaultAccount = async (details) => UserModule.defaultRegistration(details);

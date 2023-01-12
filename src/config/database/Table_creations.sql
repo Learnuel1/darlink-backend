@@ -1,5 +1,7 @@
-
-GO
+-- CREATE DATABASE darlink_db
+-- GO
+-- USE darlink_db
+-- GO
 CREATE TABLE tblusers(
     id INT NOT NULL IDENTITY(1,1)
     ,userId VARCHAR(255) NOT NULL UNIQUE
@@ -93,3 +95,4 @@ CREATE TABLE tblbutton(
     ,CONSTRAINT FK_buttonUser FOREIGN KEY(userId) REFERENCES tblusers(userId) ON DELETE CASCADE
 );
 GO
+ 

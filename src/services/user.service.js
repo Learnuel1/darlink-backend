@@ -36,6 +36,38 @@ exports.register = async (username, password, email,plan, role = "user") => {
     return { error: error };
   }
 };
+exports.defaultRegistration = async (details) => {
+  try {
+    let data;
+    let check;
+    check = await usernameExist(details.username);
+    if (check) return { error: `${details.username} is not available` };
+    check = await emailExist(details.email);
+    if (check) return { error: `${details.email} is not available` };
+    if (check.error) return { error: check.error };
+    const request = new sql.Request();
+    request.input("id", sql.VarChar, cuid());
+    request.input("username", sql.VarChar(40), details.username.trim());
+    request.input("password", sql.VarChar(255), details.password);
+    request.input("email", sql.VarChar(255), details.email.trim());
+    request.input("role", sql.VarChar(30), details.role.trim());
+    await request
+      .execute(
+        DB_ACTIONS.SP_DEFAULT_ADMIN
+      )
+      .then((result) => {
+        if (result.rowsAffected.length > 0) {
+          data = { success: true, msg: "Registration successful" };
+        } else data = { success: false, msg: "Registration failed" };
+      })
+      .then((err) => {
+        return { error: err };
+      });
+    return data;
+  } catch (error) {
+    return { error: error };
+  }
+};
 exports.create=async(details)=>{
     try {
         let data;

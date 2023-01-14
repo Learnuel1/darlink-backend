@@ -6,6 +6,7 @@ const { ACTIONS, ERROR_FIELD } = require("../utils/actions");
 
 const adminRequired=(req,res,next)=>{
     try{
+        console.log(req);
         const token = req.cookies.jwt;
         if(!token)
         return next(APIError.unauthenticated()); 
@@ -16,7 +17,7 @@ const adminRequired=(req,res,next)=>{
         req.userRole = payload.role; 
         next();
     }catch(error){
-        if( error.message ===ACTIONS.JWT_EXPIRED)
+        if( error.message ===ACTIONS.JWT_EXPIRED) //
         next(APIError.unauthenticated())
     next(error);
     }

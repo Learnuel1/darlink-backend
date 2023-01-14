@@ -195,6 +195,7 @@ exports.ctlGetProfiles=async(req,res,next)=>{
 exports.ctrlPlan=async(req,res,next)=>{
     try {
         const {plan,amount,duration}=req.body;
+        console.log(req.userId) // hy is it complaining of this code ok
         if(!req.userId)
         return next(APIError.unauthenticated());
         if(req.userRole.toLowerCase() !==ACTIONS.ADMIN)

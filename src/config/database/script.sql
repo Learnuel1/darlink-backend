@@ -12,7 +12,7 @@ CREATE PROC sp_register
  BEGIN TRY
  BEGIN TRAN
  DECLARE @defaultPlanId varchar(255)
- SET @defaultPlanId=(SELECT planId FROM tblplan WHERE [plan]=@plan)
+ SET @defaultPlanId=(SELECT TOP 1 planId FROM tblplan WHERE [plan]=@plan)
   IF @defaultPlanId IS NULL
   RAISERROR('Registration is not available at the moment',16,1)
  INSERT INTO tblusers(userId,username,password,email,role)
@@ -151,4 +151,4 @@ RAISERROR(@em,16,1)
 END CATCH
 END
 GO
-
+ 

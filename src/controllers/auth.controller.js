@@ -10,24 +10,22 @@ exports.ctrLogin =async(req,res,next)=>{
     try {
         const {username, password}=req.body;
         if(!username)
-        next(APIError.badRequest("username is required"))
+        return next(APIError.badRequest("username is required"))
         if(!password)
-        next(APIError.badRequest("password is required"))
+       return next(APIError.badRequest("password is required"))
         const exist= await getUsername(username);
         if(!exist)
-        next(APIError.customError("User does  not exist",404));
+       return next(APIError.customError("User does  not exist",404));
         if(exist.error)
-        next(APIError.customError());
-        const verify = compareSync(password,exist.password);
+         return next(APIError.customError(exist.error,400)); 
+        const verify = compareSync(password,exist.password); 
         if(!verify)
-        next(APIError.unauthenticated("Incorrect password"));
+        return   next(APIError.unauthenticated("Incorrect password"));
         let payload={};
         const userPlan= await getCurrentPlan(exist.userId);
-        if(!userPlan.error && userPlan){
-
+        if(!userPlan.error && userPlan){ 
             payload = {id:exist.userId,role:exist.role,plan:userPlan.plan};
-        }else{
-
+        }else{ 
             payload = {id:exist.userId,role:exist.role};
         }
         const data = responseBuilder.buildUser(exist);
@@ -50,15 +48,15 @@ exports.ctrDefaultUser =async(req,res,next)=>{
     try{
         const {username,password,email,role}=req.body;
         if(!username)
-        next(APIError.badRequest('Username is required'));
+       return next(APIError.badRequest('Username is required'));
         if(!password)
-        next(APIError.badRequest('Password is required'));
+       return next(APIError.badRequest('Password is required'));
         if(!email)
-        next(APIError.badRequest('Email is required'));
+       return next(APIError.badRequest('Email is required'));
         if(!role)
-        next(APIError.badRequest('Role is required'));
+       return next(APIError.badRequest('Role is required'));
         if(!isValidEmail(email))
-        next(APIError.badRequest(ERROR_FIELD.INVALID_EMAIL,400));
+       return next(APIError.badRequest(ERROR_FIELD.INVALID_EMAIL,400));
         const hashedPass = hashSync(password.trim(),12);
         const details ={username,password:hashedPass,email,role}
         const register = await defaultAccount(details);

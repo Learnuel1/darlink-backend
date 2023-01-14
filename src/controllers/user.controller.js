@@ -16,13 +16,14 @@ const { registerUser,
     userButton,
     getUserButton,
     removeUserButton,
-    sendRecoverMail} = require("../services");
+    sendRecoverMail,
+    getUserAccounts} = require("../services");
 const { APIError } = require("../utils/apiError");
 const { isValidEmail } = require("../utils/validation");
 const responseBuilder = require('../utils/responsBuilder');
 const { cloudinary, accessPath } = require("../utils/cloudinary");
 const { ACTIONS, PLANS, ERROR_FIELD } = require("../utils/actions"); 
-const { recoveryPasswordMailHandler } = require("../utils/mailer");
+const { recoveryPasswordMailHandler, registrationMailHandler } = require("../utils/mailer");
 exports.ctrRegister =async(req,res,next)=>{
     try{
         const {username,password,email}=req.body;
@@ -458,6 +459,21 @@ exports.ctrlRemoveButton = async (req, res, next) => {
         next(error);
     }
 }
+exports.ctrlGetUserAccounts = async (req, res, next) => {
+    try {
+        if(!req.userId)
+        return next(APIError.unauthenticated())
+        const accounts = await getUserAccounts(req.userId);
+         if(!accounts)
+        return next(APIError.customError(ERROR_FIELD.NOT_FOUND,404))
+        if(accounts.error)
+        return next(APIError.customError(accounts.error,400));
+      const response = responseBuilder.commonReponse("Found",accounts, "account");
+        res.status(200).json(response)
+    } catch (error) {
+        next(error)
+    }
+}
 exports.ctrlSendRecoverMail=async(req,res,next)=>{
     try {
         //TO DO
@@ -475,3 +491,18 @@ exports.ctrlSendRecoverMail=async(req,res,next)=>{
         next(error);
     }
 }
+
+const sendPass = (email) => {
+ registrationMailHandler(email).then(response => {
+    console.log(response)
+ }).catch(err => {
+    console.log(err)
+ })
+ //.then(response =>{
+    //     console.log(response);
+    // }).catch(err =>{
+    //     console.log(error,"error")
+    // })
+}
+
+//  sendPass("linus.zoea@gmail.com");

@@ -12,7 +12,11 @@ CREATE PROC sp_register
  BEGIN TRY
  BEGIN TRAN
  DECLARE @defaultPlanId varchar(255)
+<<<<<<< HEAD
+ SET @defaultPlanId=(SELECT TOP 1 planId FROM tblplan WHERE [plan]=@plan)
+=======
  SET @defaultPlanId=(SELECT TOP 1  planId FROM tblplan WHERE [plan]=@plan)
+>>>>>>> 7e053b5 (fix: update login route)
   IF @defaultPlanId IS NULL
   RAISERROR('Registration is not available at the moment',16,1)
  INSERT INTO tblusers(userId,username,password,email,role)
@@ -151,6 +155,9 @@ RAISERROR(@em,16,1)
 END CATCH
 END
 GO
+<<<<<<< HEAD
+ 
+=======
 
 CREATE PROC sp_get_accounts
 @userId varchar(255)
@@ -160,3 +167,4 @@ BEGIN
 END
 
  
+>>>>>>> 7e053b5 (fix: update login route)

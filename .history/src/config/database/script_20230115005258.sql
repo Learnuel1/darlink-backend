@@ -151,6 +151,9 @@ RAISERROR(@em,16,1)
 END CATCH
 END
 GO
+<<<<<<< HEAD
+ 
+=======
 
 CREATE PROC sp_get_accounts
 @userId varchar(255)
@@ -160,3 +163,4 @@ BEGIN
 END
 
  
+>>>>>>> 7e053b5 (fix: update login route)

@@ -159,4 +159,62 @@ BEGIN
  SELECT u.id,username,email,[status],[role], [plan],userPlanId, p.planId, amount,startDate,endDate FROM tblusers u LEFT JOIN tbluserplan p ON u.userId=p.userId WHERE u.userId !=@userId
 END
 
- 
+ GO
+ CREATE PROC sp_add_recovery_link
+ @id varchar(255)
+ ,@userid VARCHAR(255)
+ ,@uniquestring varchar(255)
+ ,@expirytime DATETIME
+ AS
+ BEGIN
+ BEGIN TRY
+ INSERT INTO tblpassword_recovery(id,userId, uniqueString,expiryTime) VALUES(@id, @userid, @uniquestring, @expirytime)
+ END TRY
+BEGIN CATCH
+ROLLBACK TRAN
+DECLARE @em VARCHAR(150)
+SET @em = ERROR_MESSAGE()
+RAISERROR(@em,16,1)
+END CATCH
+END
+GO
+
+CREATE PROC sp_reset_password_by_link
+@userid varchar(255)
+,@newpassword varchar(255)
+AS
+BEGIN
+BEGIN TRY
+BEGIN TRAN
+DELETE FROM tblpassword_recovery WHERE userId=@userid;
+UPDATE tblusers SET [password] =@newpassword ,updatedAt= GETDATE() WHERE userId=@userid
+COMMIT TRAN
+ END TRY
+BEGIN CATCH
+ROLLBACK TRAN
+DECLARE @em VARCHAR(150)
+SET @em = ERROR_MESSAGE()
+RAISERROR(@em,16,1)
+END CATCH
+END
+GO
+
+CREATE PROC sp_verify_user
+@uniquestring VARCHAR(255)
+AS
+BEGIN
+BEGIN TRY
+BEGIN TRAN
+DECLARE @userid VARCHAR(255);
+SET @userid=(SELECT userId FROM tblpassword_recovery WHERE uniqueString=@uniquestring)
+DELETE FROM tblpassword_recovery WHERE uniqueString =@uniquestring
+UPDATE tblusers SET [status]='verified' WHERE userId=@userid
+COMMIT TRAN
+ END TRY
+BEGIN CATCH
+ROLLBACK TRAN
+DECLARE @em VARCHAR(150)
+SET @em = ERROR_MESSAGE()
+RAISERROR(@em,16,1)
+END CATCH
+END

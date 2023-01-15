@@ -35,6 +35,8 @@ const userRequired =async(req,res,next)=>{
         return next(APIError.customError(isUser.error));
         req.userId=payload.id;
         req.userRole=payload.role;
+        req.username=isUser.username;
+        req.email=isUser.email;
         next();
     }catch(error){
         if( error.message ===ACTIONS.JWT_EXPIRED)

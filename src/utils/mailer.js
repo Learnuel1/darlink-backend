@@ -1,64 +1,110 @@
 const { domainMail, mailAuth } = require("./mail.auth")
 const nodemailer = require("nodemailer");
 const  mailgun  = require("nodemailer-mailgun-transport");
-const sgMail = require('@sendgrid/mail')
-require("dotenv").config();
+const sgMail = require('@sendgrid/mail');
+const hbs = require("nodemailer-express-handlebars");
+require("dotenv").config(); 
+const path = require("path");
+const CONFIG = require("../config"); 
+
+const handlebarsOptions = {
+    viewEngine:{
+        extName: ".handlebars",
+        partialsDir: path.resolve("./src/views"),
+        defaultLayout: false,
+    },
+    viewPath : path.resolve("./src/views"),
+    extName: ".handlebars",
+}
+var transporter =nodemailer.createTransport(mailgun(mailAuth)); 
+transporter.use("compile", hbs(handlebarsOptions))
 exports.mailOptions =(sendTo,subject,message)=>{
-     
     return{
         from:sendTo,
         to:domainMail.mail(),
         subject,
         text:message,
-        html:"<h1>Welcome<h1/>"
+        html: message,
     }
 }
-const sendermMailOptions =(sendTo,subject,message)=>{
-     
+const senderMailOptions =(sendTo,subject,username)=>{
     return{
-        from:domainMail.mail(),
+        from:`${CONFIG.APP_NAME} ${domainMail.mail()}`,
         to:sendTo,
-        subject,
-        html:message,
+        subject, 
+        template: "resetpassword", 
+        context:{
+            expiryTime: `"30"`,
+            link: "facebook.com",  
+        }
+    }
+}
+const passwordMailOptions =(sendTo,subject,expiryTime,uniqueString)=>{
+    return{
+        from:`${CONFIG.APP_NAME} ${domainMail.mail()}`,
+        to:sendTo,
+        subject, 
+        template: "resetpassword", 
+        context:{
+            expiryTime: `${expiryTime} `,
+            link: `${ process.env.FRONTEND_ORIGIN_URL}/user/verify-reset?id=${uniqueString}`,  
+        }
+    }
+}
+const verificationdMailOptions =(sendTo,subject,expiryTime,uniqueString,username)=>{
+    return{
+        from:`${CONFIG.APP_NAME} ${domainMail.mail()}`,
+        to:sendTo,
+        subject, 
+        template: "verify", 
+        context:{
+             expiryTime: `${expiryTime} `,
+            link: `${ process.env.FRONTEND_ORIGIN_URL}/user/verify?id=${uniqueString}`, 
+            username, 
+        }
     }
 }
  
-exports.recoveryPasswordMailHandler=async(email)=>{
-    try{ 
-        let sentData={};
-        const message =`User Account was created successfully. Click on the link to verify `
-        const transporter =nodemailer.createTransport(mailgun(mailAuth)); 
-        const mail = sendermMailOptions(email,"User Account",message) 
-        
-        transporter.sendMail(mail,(error,info)=>{ 
-            if(error){ 
-          return  sentData.error=error;
+exports.recoveryPasswordMailHandler=async(email,expiryTime,uniqueString)=>{
+   
+        return new Promise((resolve, reject) => {
+            const mail = passwordMailOptions(email, "Password Reset", expiryTime, uniqueString)
+            transporter.sendMail(mail, (err, data) => {
+                if (err) {
+                    console.log(err)
+                    return reject(err);
+                }
+                return resolve({ success: true })
+            });
+        }) 
+}
+
+ exports.registrationMailHandler=async(email,username)=>{
+     try {
+         return new Promise((resolve, reject) => {
+
+             const mail = senderMailOptions(email, "Account Registration",expiryTime, username)
+             transporter.sendMail(mail, (err, data) => {
+                 if (err) {
+                     return reject(err);
+                 }
+                 return resolve({ success: true })
+             });
+         })
+     } catch (error) {
+         return { "error": error };
+     }
+ }
+ exports.verificationMailHandler=async(email,expiryTime,uniqueString,username)=>{
+    return new Promise((resolve, reject) => { 
+        const mail = verificationdMailOptions(email,"Account Verification",expiryTime,uniqueString,username) 
+       transporter.sendMail(mail,(err,data)=>{ 
+            if(err){  
+         return  reject(err);
             } 
-            console.log(info.messageId)
-       sentData.success=true;
+            return resolve({success:true})
         });  
-        return sentData;
-    }catch(error){
-        return {"error":error};
-    }
+    })
+  
 }
  
-// sgMail.setApiKey(mailAuth.sendGridAPIKey.api_key)
-// const msg = {
-//   to: 'learnueltechdev@gmail.com', // Change to your recipient
-//   from: {
-//     name: "LearnuelTech",
-//     email: "learnueltechdev@gmail.com"
-//   }, // Change to your verified sender
-//   subject: 'Sending with SendGrid is Fun',
-//   text: 'and easy to do anywhere, even with Node.js',
-//   html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-// }
-// sgMail
-//   .send(msg)
-//   .then((response) => {
-//     console.log('Email sent',response)
-//   })
-//   .catch((error) => {
-//     console.error(error)
-//   })

@@ -9,6 +9,7 @@ exports.ACTIONS ={
     CONTACT: "contact",
     EMAIL: "email",
     COMPLETED: {success:true, msg:'Operation Successful'},
+    RESET_PASSWORD: "Password Recovery",
 }
 
 exports.PLANS={

@@ -17,13 +17,23 @@ const { registerUser,
     getUserButton,
     removeUserButton,
     sendRecoverMail,
-    getUserAccounts} = require("../services");
+    getUserAccounts,
+    passwordRecovery,
+    getUserAccount,
+    getPasswordRecoveryInfor,
+    resetLoginByLink,
+    removeRecoveryLink,
+    userVerification} = require("../services");
 const { APIError } = require("../utils/apiError");
 const { isValidEmail } = require("../utils/validation");
 const responseBuilder = require('../utils/responsBuilder');
 const { cloudinary, accessPath } = require("../utils/cloudinary");
 const { ACTIONS, PLANS, ERROR_FIELD } = require("../utils/actions"); 
-const { recoveryPasswordMailHandler, registrationMailHandler } = require("../utils/mailer");
+const { recoveryPasswordMailHandler, registrationMailHandler, mailOptions, verificationMailHandler } = require("../utils/mailer");
+const nodemailer = require("nodemailer");
+const { mailAuth } = require("../utils/mail.auth");
+const  mailgun  = require("nodemailer-mailgun-transport");
+const {v4 : uuidv4 } =require("uuid");
 exports.ctrRegister =async(req,res,next)=>{
     try{
         const {username,password,email}=req.body;
@@ -135,7 +145,7 @@ exports.ctrlUserProfile=async(req,res,next)=>{
             details.passportUrl=img.secure_url;
         }
         if(req.body.bgImage){
-            const img=await    cloudinary.uploader.upload(req.body.profileImage,{
+            const img=await    cloudinary.uploader.upload(req.body.bgImage,{
                 upload_preset:accessPath.preset(),
                 folder:accessPath.folder()
             })
@@ -476,33 +486,123 @@ exports.ctrlGetUserAccounts = async (req, res, next) => {
 }
 exports.ctrlSendRecoverMail=async(req,res,next)=>{
     try {
-        //TO DO
-        //send recovery mail
-        if(!req.mail)
-        return next(APIError.badRequest("Account not Found"));
-        const temPass ="dljperkladf";
-        recoveryPasswordMailHandler(req.email,temPass).then(async response=>{
-          const details= {email:req.mail};
-            const newPass = await sendRecoverMail(details);
-        }).catch(err=>{
+        const {id,email}=req.query;
+        if (!id)
+            return next(APIError.badRequest("use id is required", 404));
+        if (!email)
+            return next(APIError.badRequest("Email is required", 404));
+        const userExist = await getUserAccount(id, email);
+        if (!userExist)
+            return next(APIError.customError("Account was not found", 404));
+        if (userExist.error)
+            return next(APIError.customError(userExist.error))
+        const uniqueString = uuidv4() + userExist.id;
+        const expiryTime = new Date();
+        expiryTime.setTime(expiryTime.getTime() + 1800000);
+        const saveLink = await passwordRecovery(userExist.id,userExist.userId, uniqueString, expiryTime);
+        if (!saveLink)
+            return next(APIError.customError(ERROR_FIELD.NOT_FOUND, 404))
+        if (saveLink.error)
+            return next(APIError.customError(saveLink.error, 400));
 
-        })
+        const result = await recoveryPasswordMailHandler(email, "30 minutes", uniqueString);
+        if (result.error)
+            return next(APIError.customError("Recovery mail failed to send", 400))
+        res.status(200).json({ ...result, id: uniqueString, msg: "Recovery mail sent successfully" })
     } catch (error) {
         next(error);
     }
+
+}
+exports.ctrlVerifyReset = async (req, res, next) => {
+    try {
+         const { id}=req.query;
+        if(!id)
+        return next(APIError.customError("Invalid Link",400)); 
+         const check = await getPasswordRecoveryInfor(id);
+        if(!check)
+        return next(APIError.customError("Invalid Link",404))
+        if(check.error)
+        return next(APIError.customError(check.error,400));
+        //verify link
+        const currentTime = new Date();
+        if(currentTime>check.expiryTime){
+            await removeRecoveryLink(id);
+        return next(APIError.customError("Link expired",400));
+        }
+        res.status(200).json({success:true,id:check.uniqueString,msg:"Link is valid"})
+    } catch (error) {
+        return next(error);
+    }
+}
+exports.ctrlResetPassword =async(req,res,next)=>{
+    try {
+        const { id,newPassword}=req.body;
+        if(!id)
+        return next(APIError.customError("Link id is required",400)); 
+        if(!newPassword)
+        return next(APIError.badRequest("Provide new password"))
+         const check = await getPasswordRecoveryInfor(id);
+         if(!check)
+        return next(APIError.customError("Invalid Link",404))
+        const hashedPass = hashSync(newPassword,12);
+        const reset = await resetLoginByLink(check.userId,hashedPass);
+        if(!reset)
+        return next(APIError.customError("Link does not exist",404));
+        if(reset.error)
+        return next(APIError.customError(reset.error,400))
+
+        res.status(200).json({success:true,msg:"Password reset successful"});
+    } catch (error) {
+        next(error)
+    }
 }
 
-const sendPass = (email) => {
- registrationMailHandler(email).then(response => {
-    console.log(response)
- }).catch(err => {
-    console.log(err)
- })
- //.then(response =>{
-    //     console.log(response);
-    // }).catch(err =>{
-    //     console.log(error,"error")
-    // })
+exports.ctrlSendVerification =async (req, res, next) => {
+    try {
+        if(!req.userId)
+         return next(APIError.unauthenticated())
+          const uniqueString = uuidv4() + req.userId;
+           const expiryTime = new Date();
+        expiryTime.setDate(expiryTime.getDate() + 10);
+         const saveLink = await passwordRecovery(req.userId,req.userId, uniqueString, expiryTime);
+        if (!saveLink)
+            return next(APIError.customError(ERROR_FIELD.NOT_FOUND, 404))
+        if (saveLink.error)
+            return next(APIError.customError(saveLink.error, 400));
+
+        const result = await verificationMailHandler(req.email, "10 days", uniqueString, req.username);
+        if (result.error)
+            return next(APIError.customError("Recovery mail failed to send", 400))
+        res.status(200).json({ ...result, id: uniqueString, msg: "Verification mail sent successfully" })
+    } catch (error) {
+        return next(error);
+    }
 }
 
-//  sendPass("linus.zoea@gmail.com");
+exports.ctrlVeifyUser =async (req, res, next) => {
+    try {
+       
+        const {id}=req.query;
+        if(!id)
+        return next(APIError.badRequest("Invalid verification link"));
+          const check = await getPasswordRecoveryInfor(id);
+        if(!check)
+        return next(APIError.customError("Invalid Link",404))
+        if(check.error)
+        return next(APIError.customError(check.error,400));
+        const currentTime = new Date();
+        if(currentTime>check.expiryTime){
+            await removeRecoveryLink(id);
+        return next(APIError.customError("Link expired",400));
+        }
+        const verify = await userVerification(id)
+          if(!verify)
+        return next(APIError.customError("Invalid Link",404))
+        if(verify.error)
+        return next(APIError.customError("Verification failed, try again",400));
+        res.status(200).json({success:true,msg:"Verification successful"})
+    } catch (error) {
+        return next(error);
+    }
+}

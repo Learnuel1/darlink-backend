@@ -160,6 +160,26 @@ exports.currentPlan = async (userId) => {
   }
 };
 
+exports.getAccount = async (id,email) => {
+  try {
+    let data;
+    const request = new sql.Request();
+    request.input("email", sql.VarChar(40), email.trim());
+    request.input("id", sql.Int,id);
+    await request
+      .query(`SELECT * FROM tblusers WHERE email=@email AND id=@id`)
+      .then((result) => {
+        if (result.recordset.length > 0) data = result.recordset[0];
+      })
+      .then((err) => {
+        if (err) data = { error: err };
+      });
+
+    return data;
+  } catch (error) {
+    return { error: error };
+  }
+};
 exports.findAccount = async (infor) => {
   try {
     let data, value;
@@ -228,8 +248,28 @@ exports.resetPass = async (userid, newPassword) => {
     await request
       .query("UPDATE tblusers SET password =@password WHERE userId=@userid")
       .then((result) => {
-        if (result.rowsAffected > 0) data = result.rowsAffected;
-        else data = { error: "Password reset failed" };
+        if (result.rowsAffected>0 || result.rowsAffected.length > 0) 
+        data = result.rowsAffected; 
+      })
+      .then((err) => {
+        if (err) data = { error: err };
+      });
+    return data;
+  } catch (error) {
+    return { error: error };
+  }
+};
+exports.resetPassByLink = async (userid, newPassword) => {
+  try {
+    let data;
+    const request = new sql.Request();
+    request.input("newpassword", sql.VarChar(255), newPassword);
+    request.input("userid", sql.VarChar(255), userid);
+    await request
+      .execute(DB_ACTIONS.SP_RESET_PASSWORD_BY_LINK)
+      .then((result) => {
+        if (result.rowsAffected>0 || result.rowsAffected.length > 0)
+         data = result.rowsAffected; 
       })
       .then((err) => {
         if (err) data = { error: err };
@@ -448,7 +488,7 @@ exports.updatePlan = async (details) => {
       await request
         .execute(DB_ACTIONS.SP_ADMIN_UPDATE_PLAN)
         .then((result) => {
-          if (result.rowsAffected.length>0) {
+          if (result.rowsAffected>0 || result.rowsAffected.length>0) {
             data = result.rowsAffected[0];
           }
         }).catch(err=>{
@@ -485,7 +525,7 @@ exports.profileLink = async (details) => {
    request.input("subtitle",sql.VarChar(120),subtitle)
    request.input("type",sql.VarChar(10),details.type.toLowerCase())
    await request.execute(DB_ACTIONS.SP_ADD_LINK).then(result=>{
-    if(result.rowsAffected>0)
+    if(result.rowsAffected>0 || result.rowsAffected.length>0)
     data=result.rowsAffected[0];
    }).catch(err=>{
     data={error:err};
@@ -583,11 +623,87 @@ exports.removeButton = async(userId) => {
     return { error };
   }
 }
-exports.recoverPassword = async (details) => {
-    try {
-      //TO DO
-      //Send recovery link to        E-mail
-    } catch (error) {
-      return { error };
-    }
-  };
+exports.userAccounts =async (userId) => {
+  try {
+    let data;
+    const request = new sql.Request();
+    request.input("userId",sql.VarChar(255),userId);
+    await request.execute(DB_ACTIONS.SP_GET_ACCOUNTS).then(result => {
+      if(result.recordset.length>0)
+      data =result.recordset;
+    }).catch(err => {
+      data={error:err};
+    })
+    return data;
+  } catch (error) {
+    return {error};
+  }
+}
+exports.recoveryLink = async (id,userId,uniqueString,expiryTime) => {
+  try {
+    let data;
+    const request = new  sql.Request();
+    request.input("id",sql.VarChar(255),id);
+    request.input("userid",sql.VarChar(255),userId);
+    request.input("uniquestring",sql.VarChar(255),uniqueString);
+    request.input("expirytime",sql.DateTime,expiryTime);
+    await request.execute(DB_ACTIONS.SP_RECOVERY_LINK).then(result => {
+      if(result.rowsAffected.length>0)
+      data= result.rowsAffected[0];
+    }).catch(err =>{
+      data = {error:err};
+    })
+    return data;
+  } catch (error) {
+    return {error};
+  }
+}
+exports.getRecoveryInfor = async (uniqueString) => {
+  try {
+    let data; 
+    const request = new  sql.Request(); 
+    request.input('uniquestring',sql.VarChar(255),uniqueString);
+    await request.query(`SELECT * FROM tblpassword_recovery WHERE uniqueString=@uniquestring`).then(result => {
+      if(result.recordset.length>0)
+      data= result.recordset[0];
+    }).catch(err =>{
+      data = {error:err};
+    })
+    return data;
+  } catch (error) {
+    return {error};
+  }
+}
+exports.delRecoveryLink = async (uniqueString) => {
+  try {
+    let data; 
+    const request = new  sql.Request(); 
+    request.input('uniquestring',sql.VarChar(255),uniqueString);
+    await request.query(`DELETE FROM tblpassword_recovery WHERE uniqueString=@uniquestring`).then(result => {
+      if(result.recordset.length>0)
+      data= result.recordset[0];
+    }).catch(err =>{
+      data = {error:err};
+    })
+    return data;
+  } catch (error) {
+    return {error};
+  }
+}
+
+exports.verifyUser =async (uniqueString) => {
+   try {
+    let data; 
+    const request = new  sql.Request(); 
+    request.input('uniquestring',sql.VarChar(255),uniqueString);
+    await request.execute(DB_ACTIONS.SP_VERIFY_USER).then(result => {
+      if(result.rowsAffected>0 || result.rowsAffected.length>0)
+      data= result.recordset[0];
+    }).catch(err =>{
+      data = {error:err};
+    })
+    return data;
+  } catch (error) {
+    return {error};
+  }
+}

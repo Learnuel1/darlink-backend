@@ -95,4 +95,12 @@ CREATE TABLE tblbutton(
     ,CONSTRAINT FK_buttonUser FOREIGN KEY(userId) REFERENCES tblusers(userId) ON DELETE CASCADE
 );
 GO
+
+CREATE TABLE tblpassword_recovery(
+    id INT NOT NULL
+    ,userId VARCHAR(255) NOT NULL
+    ,uniqueString VARCHAR(255) NOT NULL
+    ,expiryTime DATETIME NOT NULL 
+    ,createdAt DATETIME NOT NULL DEFAULT GETDATE()
+)
  

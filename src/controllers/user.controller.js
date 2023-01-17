@@ -122,19 +122,17 @@ exports.ctrlFindUser=async(req,res,next)=>{
 exports.ctrlUserProfile=async(req,res,next)=>{
     try {
         
-        const {displayName,contact,description,location}=req.body;
+        const {displayName,description,location}=req.body;
         if(!req.userId)
         return next(APIError.unauthenticated());
-        
         if(!displayName)
         return next(APIError.badRequest(`Display name is required`))
         if(!location)
         return next(APIError.badRequest(`Location name is required`))
-        if(!contact)
-        return next(APIError.badRequest(`Contact name is required`))
         if(!description)
         return next(APIError.badRequest(`Bio name is required`))
-        const details={displayName,location,contact,description};
+        const colour= req.body.colour?req.body.colour:null;
+        const details={displayName,location,colour,description};
         if(req.body.profileImage){
             //store image
         const img=await    cloudinary.uploader.upload(req.body.profileImage,{
@@ -155,7 +153,7 @@ exports.ctrlUserProfile=async(req,res,next)=>{
         details.userId=req.userId;
         const profile = await uploadProfile(details);
         if(!profile)
-        return next(APIError.customError());
+        return next(APIError.customError("No profile found",404));
         if(profile.error)
         return next(APIError.customError(profile.error,400));
         

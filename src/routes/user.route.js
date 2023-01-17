@@ -9,7 +9,7 @@ userRoute.post('/recovery-mail',Controller.userControl.ctrlSendRecoverMail);
 userRoute.post('/reset-password',Controller.userControl.ctrlResetPassword);
 userRoute.get('/verify-reset',Controller.userControl.ctrlVerifyReset);
 userRoute.post('/profile',userRequired,Controller.userControl.ctrlUserProfile);
-userRoute.get('/profile',adminRequired,Controller.userControl.ctlGetProfile);
+userRoute.get('/profile',userRequired,Controller.userControl.ctlGetProfile);
 userRoute.get('/profiles',adminRequired,Controller.userControl.ctlGetProfiles);
 userRoute.get('/',Controller.userControl.ctrlGetPlans)
 userRoute.post('/resources',userRequired,userPlanRequired,Controller.userControl.ctrlLink)

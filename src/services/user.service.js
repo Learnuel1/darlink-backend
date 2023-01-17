@@ -291,7 +291,7 @@ exports.profile = async (details) => {
       displayName,
       description,
       location,
-      contact;
+      colour;
     if (details.bgId) bgId = details.bgId;
     if (details.bgUrl) bgUrl = details.bgUrl;
     if (details.passportId) passportId = details.passportId;
@@ -299,7 +299,7 @@ exports.profile = async (details) => {
     if (details.displayName) displayName = details.displayName;
     if (details.description) description = details.description;
     if (details.location) location = details.location;
-    if (details.contact) contact = details.contact;
+    if (details.colour) colour = details.colour;
     const request = new sql.Request();
     request.input(`userId`, sql.VarChar(255), userId);
     request.input(`profileId`, sql.VarChar(255), cuid());
@@ -310,7 +310,7 @@ exports.profile = async (details) => {
     request.input(`displayName`, sql.VarChar(50), displayName);
     request.input(`description`, sql.VarChar(255), description);
     request.input(`location`, sql.VarChar(255), location);
-    request.input(`contact`, sql.VarChar(255), contact);
+    request.input(`colour`, sql.VarChar(255), colour);
     await request
       .query(
         `IF (SELECT COUNT(Id) FROM tblprofile)=0 
@@ -318,7 +318,7 @@ exports.profile = async (details) => {
         INSERT INTO tblprofile(profileId,userId,bgId,bgUrl,passportId,
             passportUrl,
             description, 
-            displayName,location,contact)
+            displayName,location,colour)
              VALUES (@profileId,@userId,
                 @bgId,
                 @bgUrl,
@@ -326,7 +326,7 @@ exports.profile = async (details) => {
                 @passportUrl,
                 @description, 
                 @displayName,
-                @location,@contact)
+                @location,@colour)
             END
            ELSE
            BEGIN
@@ -338,7 +338,7 @@ exports.profile = async (details) => {
            [description]=@description, 
            displayName=@displayName,
            location=@location,
-           contact=@contact,
+           colour=@colour,
            updatedAt=GETDATE()
             WHERE userId=@userId
            END

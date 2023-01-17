@@ -27,7 +27,7 @@ CREATE TABLE tblprofile(
     ,location VARCHAR(60) NOT NULL
     ,[description] VARCHAR(200) NOT NULL
     ,displayName VARCHAR(50)NOT NULL
-    ,contact VARCHAR(20) NOT NULL
+    ,colour VARCHAR(20) NULL
 	,createdAt DATETIME NOT NULL DEFAULT GETDATE()
     ,updatedAt DATETIME NOT NULL DEFAULT GETDATE()
     ,CONSTRAINT PK_profile PRIMARY KEY(profileId)

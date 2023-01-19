@@ -8,7 +8,7 @@ const sqlConfig = {
     password: getDB_PWD(),
     database: getDB_NAME(),
     server:SERVER_NAME,// "LEARNUELTECHNOL\\SQLEXPRESS",
-    driver:"msnodesqlv8",
+    // driver:"msnodesqlv8",
     pool: {
       max: 10,
       min: 0,

@@ -7,8 +7,8 @@ const sqlConfig = {
      user: getDB_USER(),
     password: getDB_PWD(),
     database: getDB_NAME(),
-    server:SERVER_NAME,// "LEARNUELTECHNOL\\SQLEXPRESS",
-    // driver:"msnodesqlv8",
+    server:SERVER_NAME,// "LEARNUELTECHNOL\\SQLEXPRESS", //use instance for local dev
+    // driver:"msnodesqlv8", //endable for local dev
     pool: {
       max: 10,
       min: 0,

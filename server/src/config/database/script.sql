@@ -1,5 +1,5 @@
 
-CREATE PROC sp_register
+CREATE PROCEDURE sp_register
 @id varchar(255)
 ,@username varchar(60)
 ,@password varchar(255)
@@ -30,7 +30,7 @@ CREATE PROC sp_register
  END CATCH
  END
 GO
-CREATE PROC sp_default_admin
+CREATE PROCEDURE sp_default_admin
 @id varchar(255)
 ,@username varchar(60)
 ,@password varchar(255)
@@ -56,7 +56,7 @@ CREATE PROC sp_default_admin
  END
 GO
 
-CREATE PROC sp_update_plan
+CREATE PROCEDURE sp_update_plan
 @planId VARCHAR(255)
 ,@plans VARCHAR(60)
 ,@amount DECIMAL(9,2)
@@ -81,7 +81,7 @@ END CATCH
 END 
 GO
 
-CREATE PROC sp_add_user_links
+CREATE PROCEDURE sp_add_user_links
 @userId varchar(255)
 ,@linkId varchar(255)
 ,@type VARCHAR(10)
@@ -116,7 +116,7 @@ END CATCH
 END
 GO
 
-CREATE PROC sp_add_user_button
+CREATE PROCEDURE sp_add_user_button
 @userId VARCHAR(255)
 ,@buttonId VARCHAR(255)
 ,@type VARCHAR(20)
@@ -152,7 +152,7 @@ END CATCH
 END
 GO
 
-CREATE PROC sp_get_accounts
+CREATE PROCEDURE sp_get_accounts
 @userId varchar(255)
 AS
 BEGIN
@@ -160,7 +160,7 @@ BEGIN
 END
 
  GO
- CREATE PROC sp_add_recovery_link
+ CREATE PROCEDURE sp_add_recovery_link
  @id varchar(255)
  ,@userid VARCHAR(255)
  ,@uniquestring varchar(255)
@@ -179,7 +179,7 @@ END CATCH
 END
 GO
 
-CREATE PROC sp_reset_password_by_link
+CREATE PROCEDURE sp_reset_password_by_link
 @userid varchar(255)
 ,@newpassword varchar(255)
 AS
@@ -199,7 +199,7 @@ END CATCH
 END
 GO
 
-CREATE PROC sp_verify_user
+CREATE PROCEDURE sp_verify_user
 @uniquestring VARCHAR(255)
 AS
 BEGIN

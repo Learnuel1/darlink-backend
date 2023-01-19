@@ -1,12 +1,13 @@
 const sql =require('mssql/msnodesqlv8');
-const {  getDB_NAME, getDB_PWD, getDB_USER } = require('../env');
+const {  getDB_NAME, getDB_PWD, getDB_USER, getDB_SERVER } = require('../env');
 
 const DB=getDB_NAME();
+const SERVER_NAME =getDB_SERVER();
 const sqlConfig = {
-    // user: getDB_USER(),
-    // password: getDB_PWD(),
-    database: DB,
-    server: "LEARNUELTECHNOL\\SQLEXPRESS",
+     user: getDB_USER(),
+    password: getDB_PWD(),
+    database: getDB_NAME(),
+    server:SERVER_NAME,// "LEARNUELTECHNOL\\SQLEXPRESS",
     driver:"msnodesqlv8",
     pool: {
       max: 10,
@@ -15,7 +16,7 @@ const sqlConfig = {
     },
     options: {
     //   encrypt: true, // for azure
-      trustedConnection:true,
+      // trustedConnection:true,
       trustServerCertificate: true // change to true for local dev / self-signed certs
     }
 

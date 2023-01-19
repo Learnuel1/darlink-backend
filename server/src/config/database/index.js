@@ -1,4 +1,4 @@
-const sql =require('mssql/msnodesqlv8');
+const sql =require('mssql');
 const {  getDB_NAME, getDB_PWD, getDB_USER, getDB_SERVER } = require('../env');
 
 const DB=getDB_NAME();

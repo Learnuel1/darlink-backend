@@ -707,3 +707,36 @@ exports.verifyUser =async (uniqueString) => {
     return {error};
   }
 }
+
+exports.updateInfor = async(email,username,userid) => {
+  try{
+    let data;
+     let check;
+    check = await usernameExist(username);
+    if (check) return { error: `${username} is not available` };
+    check = await emailExist(email);
+    if (check) return { error: `${email} is not available` };
+    if (check.error) return { error: check.error };
+
+    const request = new sql.Request();
+    request.input("userid",sql.VarChar(255),userid);
+    request.input("email",sql.VarChar(255),email);
+    request.input("username",sql.VarChar(40),username);
+    await request.query(`IF @email IS NOT NULL 
+    UPDATE tblusers SET email=@email WHERE userId=@userid
+    
+    IF @username IS NOT NULL 
+    UPDATE tblusers SET username= @username  WHERE userId=@userid
+    `)
+    .then(result => {
+      if(result.rowsAffected>0 ||result.rowsAffected.length>0)
+      data= result.rowsAffected[0]
+    })
+    .catch(err =>{
+      data ={error:err};
+    })
+    return data;
+  }catch(error){
+    return {error};
+  }
+}

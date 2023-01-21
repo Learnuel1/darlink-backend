@@ -34,3 +34,4 @@ exports.getPasswordRecoveryInfor =async (uniqueString) => UserModule.getRecovery
 exports.resetLoginByLink = async (userid, newPassword) => UserModule.resetPassByLink(userid, newPassword);
 exports.removeRecoveryLink = async (uniqueString) => UserModule.delRecoveryLink(uniqueString);
 exports.userVerification = async (uniqueString) => UserModule.verifyUser(uniqueString);
+exports.updateUserInfor = async (email,username, userId) => UserModule.updateInfor(email,username, userId);

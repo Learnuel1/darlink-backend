@@ -20,6 +20,7 @@ userRoute.get("/button",userRequired, Controller.userControl.ctrlGetButton)
 userRoute.delete("/button",userRequired, Controller.userControl.ctrlRemoveButton)
 userRoute.post("/verification-link",userRequired,Controller.userControl.ctrlSendVerification)
 userRoute.get("/verify",Controller.userControl.ctrlVeifyUser);
+userRoute.patch("/update",userRequired,Controller.userControl.ctrlUpdateUserInfor)
 
 
 userRoute.use("*",errorMiddleWareModule.notFound);

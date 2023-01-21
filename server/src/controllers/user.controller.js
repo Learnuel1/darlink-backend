@@ -23,7 +23,8 @@ const { registerUser,
     getPasswordRecoveryInfor,
     resetLoginByLink,
     removeRecoveryLink,
-    userVerification} = require("../services");
+    userVerification,
+    updateUserInfor} = require("../services");
 const { APIError } = require("../utils/apiError");
 const { isValidEmail } = require("../utils/validation");
 const responseBuilder = require('../utils/responsBuilder');
@@ -602,5 +603,28 @@ exports.ctrlVeifyUser =async (req, res, next) => {
         res.status(200).json({success:true,msg:"Verification successful"})
     } catch (error) {
         return next(error);
+    }
+}
+
+exports.ctrlUpdateUserInfor = async (req, res, next) => {
+    try {
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        let email,username;
+        if(req.body.email)
+        email=req.body.email;
+        if(req.body.username)
+        username=req.body.username;
+    if(!email && !username)
+    return next(APIError.badRequest(`Username or email is required`));
+    const updated = await updateUserInfor(email,username,req.userId);
+    if(!updated)
+      return next(APIError.customError(ERROR_FIELD.NOT_FOUND, 404))
+    if(updated.error)
+    return next(APIError.customError(updated.error,400));
+       res.status(200).json({success:true,msg:"Infor updated successfully"});
+
+    } catch (error) {
+        next(error);
     }
 }

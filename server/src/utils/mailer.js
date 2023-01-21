@@ -35,7 +35,7 @@ const senderMailOptions =(sendTo,subject,username)=>{
         template: "resetpassword", 
         context:{
             expiryTime: `"30"`,
-            link: "facebook.com",  
+            link: `${ process.env.FRONTEND_ORIGIN_URL}`,  
         }
     }
 }

@@ -21,5 +21,6 @@ try {
    console.log(`server running on port ${PORT}`)
 } catch (error) {
     console.log(error)
+    process.exit(-1)
 }
 })

@@ -345,7 +345,7 @@ exports.profile = async (details) => {
            `
       )
       .then((result) => {
-        if (result.rowsAffected > 0) {
+        if (result.rowsAffected > 0 || result.rowsAffected.length > 0) {
           data = result.rowsAffected[0];
         }
       })

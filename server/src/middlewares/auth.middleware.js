@@ -1,4 +1,4 @@
-const { getTokenSecrete } = require("../config/env"); 
+const { getTokenSecrete, getRefreshTokenSecrete } = require("../config/env"); 
 const { APIError } = require("../utils/apiError");
 const jwt = require("jsonwebtoken");
 const { userExist, getUserPlan } = require("../services");
@@ -14,6 +14,20 @@ const adminRequired=(req,res,next)=>{
       return next(APIError.unauthorized()); 
         req.userId = payload.id;
         req.userRole = payload.role; 
+        //extend cookie
+       const newPayload={};
+         for(key in payload){
+            if(key !=="exp" && key !=="iat")
+            newPayload[key]=payload[key];
+         }
+      const newtoken = jwt.sign(newPayload,getTokenSecrete(),{expiresIn:'30m'});
+      const refreshToken = jwt.sign(newPayload,getRefreshTokenSecrete(),{expiresIn:"60m"});
+          res.cookie('jwt',newtoken,{
+            httpOnly:false,
+            secure:true,
+            sameSite:'none',
+            maxAge:60*60*1000
+        });
         next();
     }catch(error){
         if( error.message ===ACTIONS.JWT_EXPIRED)
@@ -36,6 +50,20 @@ const userRequired =async(req,res,next)=>{
         req.userRole=payload.role;
         req.username=isUser.username;
         req.email=isUser.email;
+         //extend cookie
+         const newPayload={};
+         for(key in payload){
+            if(key !=="exp" && key !=="iat")
+            newPayload[key]=payload[key];
+         }
+      const newtoken = jwt.sign(newPayload,getTokenSecrete(),{expiresIn:'30m'});
+      const refreshToken = jwt.sign(newPayload,getRefreshTokenSecrete(),{expiresIn:"60m"});
+        res.cookie('jwt',newtoken,{
+            httpOnly:false,
+            secure:true,
+            sameSite:'none',
+            maxAge:60*60*1000
+        });
         next();
     }catch(error){
         if( error.message ===ACTIONS.JWT_EXPIRED)
@@ -58,6 +86,7 @@ const userRequired =async(req,res,next)=>{
         next(error);
     }
  }
+
 module.exports={
     adminRequired,
     userRequired,

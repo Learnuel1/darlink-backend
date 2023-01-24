@@ -12,8 +12,8 @@ app.set('views', '../src/views');
 
 app.use('/api/v1/',appRoute.routesRouter)
 
-app.use('*',errorMiddleWareModule.notFound);
-app.all(errorMiddleWareModule.errorHandler);
+app.all("*",errorMiddleWareModule.notFound );
+app.use(errorMiddleWareModule.errorHandler);
 
 app.listen(PORT,async()=>{
 try {

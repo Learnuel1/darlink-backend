@@ -10,8 +10,8 @@ planRoute.post('/',adminRequired, Controller.userControl.ctrlPlan)
 planRoute.delete('/',adminRequired, Controller.userControl.ctrlDelatePlan)
 planRoute.get('/user-plan',userRequired, Controller.userControl.ctrlGetUserPlans)
 planRoute.put('/',adminRequired,Controller.userControl.ctrlUpdatePlan)
-planRoute.use("*",errorMiddleWareModule.notFound);
-planRoute.all(errorMiddleWareModule.errorHandler);
+
+ 
 
 module.exports={
     planRoute,

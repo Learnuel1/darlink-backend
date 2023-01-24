@@ -13,10 +13,8 @@ authRoute.patch('/reset',userRequired,Controller.AuthControl.ctrlResetLogin);
 authRoute.post('/plan',adminRequired,Controller.userControl.ctrlPlan)
 authRoute.post('/default',Controller.AuthControl.ctrDefaultUser)
 authRoute.get('/users', adminRequired, Controller.userControl.ctrlGetUserAccounts)
-
-authRoute.use("*",notFound);
-authRoute.all(errorHandler);
-
+authRoute.post('/check', Controller.AuthControl.ctrlCheckUser);
+ 
 module.exports={
     authRoute,
 }

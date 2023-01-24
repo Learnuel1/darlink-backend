@@ -154,10 +154,9 @@ exports.ctrlUserProfile=async(req,res,next)=>{
         details.userId=req.userId;
         const profile = await uploadProfile(details);
         if(!profile)
-        return next(APIError.customError("No profile found",404));
+         return next(APIError.customError( "No profile found",400));
         if(profile.error)
-        return next(APIError.customError(profile.error,400));
-        
+        return next(APIError.customError( profile.error,400));
         res.status(200).json({success:true,msg:`Profile updated sucessfully`})
 
     } catch (error) {
@@ -171,9 +170,9 @@ exports.ctlGetProfile=async(req,res,next)=>{
         return next(APIError.unauthenticated());
         const profile = await getUserProfile(req.userId);
         if(!profile)
-        return next(APIError.customError("user does not exist",404));
+        return res.status(404).json({error:"user does not exist"});
         if(profile.error)
-        return next(APIError.customError(profile.error,400));
+        return next(APIError.customError( profile.error,400));
       const data=  responseBuilder.buildProfile(profile);
            const response = responseBuilder.commonReponse("Found",data,"profile");
            res.status(200).json(response);
@@ -183,7 +182,6 @@ exports.ctlGetProfile=async(req,res,next)=>{
 }
 exports.ctlGetProfiles=async(req,res,next)=>{
     try {
-        
         if(!req.userId)
         return next(APIError.unauthenticated());
         if(!req.userRole)

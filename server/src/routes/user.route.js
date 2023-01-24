@@ -22,10 +22,7 @@ userRoute.post("/verification-link",userRequired,Controller.userControl.ctrlSend
 userRoute.get("/verify",Controller.userControl.ctrlVeifyUser);
 userRoute.patch("/update",userRequired,Controller.userControl.ctrlUpdateUserInfor)
 
-
-userRoute.use("*",errorMiddleWareModule.notFound);
-userRoute.all(errorMiddleWareModule.errorHandler);
-
+ 
 module.exports={
     userRoute,
 }

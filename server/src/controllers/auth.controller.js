@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const responseBuilder = require('../utils/responsBuilder');
 const { ERROR_FIELD } = require("../utils/actions");
 const { isValidEmail } = require("../utils/validation");
+
 exports.ctrLogin =async(req,res,next)=>{
     try {
         const {username, password}=req.body;
@@ -15,12 +16,12 @@ exports.ctrLogin =async(req,res,next)=>{
        return next(APIError.badRequest("password is required"))
         const exist= await getUsername(username);
         if(!exist)
-       return next(APIError.customError("User does  not exist",404));
+       return next(APIError.customError( "User does  not exist",404));
         if(exist.error)
-         return next(APIError.customError(exist.error,400)); 
+         return next(APIError.customError( exist.error,400)); 
         const verify = compareSync(password,exist.password); 
         if(!verify)
-        return   next(APIError.unauthenticated("Incorrect password"));
+       return next(APIError.badRequest("Incorrect password",400));
         let payload={};
         const userPlan= await getCurrentPlan(exist.userId);
         if(!userPlan.error && userPlan){ 
@@ -74,7 +75,7 @@ exports.ctrLogout=async(req,res,next)=>{
     try {
         const cookies = req.cookies;
         if(!cookies?.jwt)
-        return next(APIError.customError("No valid cookie",400));
+        return res.status(400).json({error:"No valid cookie"});
         const token =cookies.jwt;
         const payload = jwt.decode(token,getTokenSecrete());
         const exist = await userExist(payload.id);
@@ -99,9 +100,9 @@ exports.ctrlResetLogin =async(req,res,next)=>{
         return next(APIError.badRequest("Provide new password"))
         const check = await userExist(req.userId);
         if(!check)
-        return next(APIError.customError("Incorrect password",404))
+        return res.status(404).json({error:"Incorrect password"})
         if(check.error)
-        return next(APIError.customError(check.error,400));
+        return res.status(404).json({error:check.error});
         const verify = compareSync(currentPassword,check.password);
         if(!verify)
         return next(APIError.customError("current password is incorrect",400));
@@ -114,6 +115,19 @@ exports.ctrlResetLogin =async(req,res,next)=>{
 
         res.status(200).json({success:true,msg:"Password reset successful"});
     } catch (error) {
+        next(error)
+    }
+}
+
+exports.ctrlCheckUser =(req, res, next) => {
+    try{
+          const token = req.cookies.jwt;
+        if(!token)
+        return next(APIError.unauthenticated()); 
+        const verify = jwt.verify(token, getTokenSecrete());
+        if(verify)
+        res.status(200).json({success:true, msg:"User is Authenticated"})
+    }catch(error){
         next(error)
     }
 }

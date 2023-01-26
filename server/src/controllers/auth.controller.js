@@ -4,7 +4,7 @@ const { getUsername, userExist, resetUserLogin, getCurrentPlan, createAdmin, def
 const { APIError } = require("../utils/apiError");
 const jwt = require('jsonwebtoken');
 const responseBuilder = require('../utils/responsBuilder');
-const { ERROR_FIELD } = require("../utils/actions");
+const { ERROR_FIELD, ACTIONS } = require("../utils/actions");
 const { isValidEmail } = require("../utils/validation");
 
 exports.ctrLogin =async(req,res,next)=>{
@@ -128,6 +128,8 @@ exports.ctrlCheckUser =(req, res, next) => {
         if(verify)
         res.status(200).json({success:true, msg:"User is Authenticated"})
     }catch(error){
-        next(error)
+         if( error.message ===ACTIONS.JWT_EXPIRED)
+        next(APIError.unauthenticated())
+      else  next(error)
     }
 }

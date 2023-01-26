@@ -31,6 +31,7 @@ const sqlConnection=async()=>{
         console.log(error)
         process.exit(-1);
     }
+    process.exit(-1)
 }
 
 module.exports={

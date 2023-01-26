@@ -24,7 +24,10 @@ const { registerUser,
     resetLoginByLink,
     removeRecoveryLink,
     userVerification,
-    updateUserInfor} = require("../services");
+    updateUserInfor,
+    userAppearance,
+    getAppearance,
+    deleteAccount} = require("../services");
 const { APIError } = require("../utils/apiError");
 const { isValidEmail } = require("../utils/validation");
 const responseBuilder = require('../utils/responsBuilder');
@@ -622,6 +625,72 @@ exports.ctrlUpdateUserInfor = async (req, res, next) => {
     return next(APIError.customError(updated.error,400));
        res.status(200).json({success:true,msg:"Infor updated successfully"});
 
+    } catch (error) {
+        next(error);
+    }
+}
+
+exports.ctrlAppearance = async (req, res, next) => {
+    try {
+        const { type } = req.body;
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        if(!type)
+        return next(APIError.badRequest("Type is required"));
+        const infor = {};
+        for(key in req.body){
+            if(key !== "iconImage")
+            infor[key] = req.body[key];
+        };
+         infor.userId = req.userId;
+        if(req.body.iconImage){
+             const img = await    cloudinary.uploader.upload(req.body.iconImage,{
+                upload_preset:accessPath.preset(),
+                folder:accessPath.folder()
+            })
+            infor.iconId=img.public_id;
+            infor.iconUrl=img.secure_url;
+        }
+        const save = await userAppearance(infor);
+        if(!save)
+        return next(APIError.customError(ERROR_FIELD.NOT_FOUND,404));
+        if(save.error)
+        return next(APIError.customError(save.error,400));
+
+        res.status(200).json({success:true, msg: "Operation successful"});
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.ctrlGetAppearance = async (req, res, next ) => {
+    try {
+        if(!req.userId)
+        return next( APIError.unauthenticated());
+        const infor = await getAppearance(req.userId);
+        if(!infor)
+        return next(APIError.customError(ERROR_FIELD.NOT_FOUND,404));
+        if(infor.error)
+        return next(APIError.customError(infor.error,404));
+        const data = infor.map( (cur) => {
+            return responseBuilder.buildPlan(cur);
+        })
+        const response  = responseBuilder.commonReponse("Found",data, "appearance");
+        res.status(200).json(response);
+    } catch (error) {
+        next(error);
+    }
+}
+exports.ctrlDeleteAcctount = async (req, res, next) => {
+    try {
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        const delAccount = await  deleteAccount(req.userId);
+         if(!delAccount)
+        return next(APIError.customError(ERROR_FIELD.NOT_FOUND,404));
+        if(delAccount.error)
+        return next(APIError.customError(delAccount.error,400));
+        res.status(200).json({success:true, msg: "Account Deleted Successfully"});
     } catch (error) {
         next(error);
     }

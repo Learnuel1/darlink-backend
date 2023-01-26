@@ -35,3 +35,6 @@ exports.resetLoginByLink = async (userid, newPassword) => UserModule.resetPassBy
 exports.removeRecoveryLink = async (uniqueString) => UserModule.delRecoveryLink(uniqueString);
 exports.userVerification = async (uniqueString) => UserModule.verifyUser(uniqueString);
 exports.updateUserInfor = async (email,username, userId) => UserModule.updateInfor(email,username, userId);
+exports.deleteAccount = async (userId) => UserModule.delete(userId);
+exports.userAppearance = async (infor) => UserModule.appearance(infor);
+exports.getAppearance = async (userId) => UserModule.userAppearance(userId);

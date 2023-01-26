@@ -21,8 +21,10 @@ userRoute.delete("/button",userRequired, Controller.userControl.ctrlRemoveButton
 userRoute.post("/verification-link",userRequired,Controller.userControl.ctrlSendVerification)
 userRoute.get("/verify",Controller.userControl.ctrlVeifyUser);
 userRoute.patch("/update",userRequired,Controller.userControl.ctrlUpdateUserInfor)
-
+userRoute.delete("/account", userRequired, Controller.userControl.ctrlDeleteAcctount);
+userRoute.post("/appearance",userRequired, Controller.userControl.ctrlAppearance);
+userRoute.get("/appearance", userRequired, Controller.userControl.ctrlGetAppearance); 
  
-module.exports={
+module.exports={ 
     userRoute,
 }

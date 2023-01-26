@@ -103,4 +103,17 @@ CREATE TABLE tblpassword_recovery(
     ,expiryTime DATETIME NOT NULL 
     ,createdAt DATETIME NOT NULL DEFAULT GETDATE()
 )
- 
+
+CREATE TABLE tblappearance(
+    id INT NOT NULL IDENTITY(1,1)
+    ,appearanceId VARCHAR(255) NOT NULL
+    ,userId VARCHAR(255) NOT NULL
+    ,[type] VARCHAR(10) NOT NULL CHECK([type] IN('font','theme','icon','link','colour'))
+    ,iconUrl VARCHAR(255) NULL
+    ,iconId VARCHAR(255) NULL
+    ,[data] VARCHAR(255) NULL
+    ,createdAt DATETIME NOT NULL DEFAULT GETDATE()
+    ,updatedAt DATETIME NOT NULL DEFAULT GETDATE()
+    ,CONSTRAINT PK_appearance PRIMARY KEY(appearanceId)
+    ,CONSTRAINT FK_userAppearance FOREIGN KEY(userId) REFERENCES tblusers(userId) ON DELETE CASCADE
+) 

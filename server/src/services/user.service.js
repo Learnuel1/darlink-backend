@@ -1,6 +1,7 @@
 const { sql } = require("../config/database");
 const cuid = require("cuid");
 const { DB_ACTIONS } = require("../config/database/action");
+const { VarChar } = require("mssql");
 
 exports.register = async (username, password, email,plan, role = "user") => {
   try {
@@ -738,5 +739,70 @@ exports.updateInfor = async(email,username,userid) => {
     return data;
   }catch(error){
     return {error};
+  }
+}
+
+exports.appearance = async (infor) => {
+  try {
+    let iconId,iconUrl,data, appearanceId, stored;
+    if(infor.iconId)
+    iconId = infor.iconId
+    if(infor.iconUrl)
+    iconUrl = infor.iconUrl
+    if(infor.data)
+   if(!infor.appearanceId)
+    appearanceId = cuid();
+  const request = new sql.Request();
+  request.input("appearanceId",VarChar(255), appearanceId);
+  request.input("iconId", sql.VarChar(255), iconId)
+  request.input("userId", sql.VarChar(255), infor.userId)
+  request.input("iconUrl", sql.VarChar(255), iconUrl)
+  request.input("data", sql.VarChar(255), infor.data)
+  request.input("type", sql.VarChar(255), infor.type);
+  await request.execute(DB_ACTIONS.SP_ADD_APPEARANCE).then(result => {
+    if(result.recordsets.length>0){
+      stored = result.recordset[0];
+    } else if( result.rowsAffected>0 || result.rowsAffected.length>0){
+      stored = result.rowsAffected[0];
+    }
+  }).catch(err => {
+    stored = {error:err};
+  })
+    return stored;
+  } catch (error) {
+    return {error};
+  }
+}
+exports.userAppearance = async (userId) => {
+  try {
+    let data ;
+    const request = new sql.Request();
+    request.input("userId", sql.VarChar(255), userId);
+    await request.query(`SELECT * FROM tblappearance WHERE userId = @userId`).then( result => {
+      if(result.recordset.length>0)
+      data = result.recordset;
+    }).catch( err => {
+      data = { error : err};
+    })
+    return data;
+  } catch (error) {
+    return {error};
+  }
+}
+
+exports.delete = async (userId) => {
+  try {
+    let data;
+    const request = new sql.Request();
+    request.input("userId", sql.VarChar(255), userId);
+  await  request.query(`DELETE FROM tblusers WHERE userId =@userid`).then(result => {
+      if(result.rowsAffected.length>0)
+      data = result.rowsAffected[0];
+    }).catch(err => {
+      data = {eror: err};
+    })
+    return data;
+  } catch (error) {
+    return { error }
   }
 }

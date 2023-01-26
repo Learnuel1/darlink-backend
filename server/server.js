@@ -17,7 +17,7 @@ app.use(errorMiddleWareModule.errorHandler);
 
 app.listen(PORT,async()=>{
 try {
-   await dbConnect.sqlConnection();
+ await dbConnect.sqlConnection();
    console.log(`server running on port ${PORT}`)
 } catch (error) {
     console.log(error)

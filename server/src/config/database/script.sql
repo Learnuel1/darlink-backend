@@ -218,3 +218,49 @@ SET @em = ERROR_MESSAGE()
 RAISERROR(@em,16,1)
 END CATCH
 END
+
+GO
+
+CREATE PROCEDURE sp_add_appearance
+@appearanceId varchar(255)
+,@userId VARCHAR(255)
+,@type VARCHAR(10)
+,@data VARCHAR(255)
+,@iconId VARCHAR(255)
+,@iconUrl VARCHAR(255)
+AS
+BEGIN
+BEGIN TRY
+BEGIN TRAN
+  
+  IF  (SELECT COUNT(id) appearanceId FROM tblappearance WHERE userId = @userId AND  [type]=LOWER(@type))=0
+  BEGIN
+  IF LOWER(@type) = 'icon'
+  BEGIN
+  INSERT INTO tblappearance(appearanceId, userId, [type], iconId, iconUrl) VALUES(@appearanceId,@userId, @type, @iconId, @iconUrl)
+  END
+  ELSE
+  BEGIN
+  INSERT INTO tblappearance(appearanceId, userId, [type], [data]) VALUES(@appearanceId, @userId, @type, @data)
+  END
+  END
+  ELSE
+  BEGIN
+  IF LOWER(@type) = 'icon'
+  BEGIN
+  UPDATE tblappearance SET iconId = @iconId, iconUrl=@iconUrl  WHERE userId = @userId AND  [type]=LOWER(@type)
+  END
+  ELSE
+  BEGIN 
+  UPDATE tblappearance SET [data]=@data WHERE  userId = @userId AND  [type]= LOWER(@type)
+  END
+  END
+COMMIT TRAN
+END TRY
+BEGIN CATCH
+ROLLBACK TRAN
+DECLARE @em VARCHAR(150)
+SET @em = ERROR_MESSAGE()
+RAISERROR(@em,16,1)
+END CATCH
+END

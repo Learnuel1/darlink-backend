@@ -795,7 +795,7 @@ exports.delete = async (userId) => {
     let data;
     const request = new sql.Request();
     request.input("userId", sql.VarChar(255), userId);
-  await  request.query(`DELETE FROM tblusers WHERE userId =@userid`).then(result => {
+  await  request.query(`DELETE FROM tblusers WHERE id =@userid`).then(result => {
       if(result.rowsAffected.length>0)
       data = result.rowsAffected[0];
     }).catch(err => {

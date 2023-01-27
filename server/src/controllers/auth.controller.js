@@ -1,6 +1,6 @@
 const { compareSync, hashSync } = require("bcryptjs");
 const { getTokenSecrete, getRefreshTokenSecrete } = require("../config/env");
-const { getUsername, userExist, resetUserLogin, getCurrentPlan, createAdmin, defaultAccount } = require("../services");
+const { getUsername, userExist, resetUserLogin, getCurrentPlan, createAdmin, defaultAccount, deleteAccount } = require("../services");
 const { APIError } = require("../utils/apiError");
 const jwt = require('jsonwebtoken');
 const responseBuilder = require('../utils/responsBuilder');
@@ -131,5 +131,25 @@ exports.ctrlCheckUser =(req, res, next) => {
          if( error.message ===ACTIONS.JWT_EXPIRED)
         next(APIError.unauthenticated())
       else  next(error)
+    }
+}
+
+exports.ctrlDeleteAcctount = async (req, res, next) => {
+    try {
+        const {userId} =req.query;
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        if(req.userRole.toLowerCase() !== 'admin')
+        return next(APIError.unauthorized());
+        if(!userId)
+        return next(APIError.badRequest("Account id to delete is required"));
+        const delAccount = await  deleteAccount(req.userId);
+         if(!delAccount)
+        return next(APIError.customError(ERROR_FIELD.NOT_FOUND,404));
+        if(delAccount.error)
+        return next(APIError.customError(delAccount.error,400));
+        res.status(200).json({success:true, msg: "Account Deleted Successfully"});
+    } catch (error) {
+        next(error);
     }
 }

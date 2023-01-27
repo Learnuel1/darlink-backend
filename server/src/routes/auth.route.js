@@ -14,7 +14,7 @@ authRoute.post('/plan',adminRequired,Controller.userControl.ctrlPlan)
 authRoute.post('/default',Controller.AuthControl.ctrDefaultUser)
 authRoute.get('/users', adminRequired, Controller.userControl.ctrlGetUserAccounts)
 authRoute.post('/check', Controller.AuthControl.ctrlCheckUser);
- 
+ authRoute.delete("/user", adminRequired, Controller.AuthControl.ctrlDeleteAcctount)
 module.exports={
     authRoute,
 }

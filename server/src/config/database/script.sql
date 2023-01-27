@@ -248,11 +248,11 @@ BEGIN TRAN
   BEGIN
   IF LOWER(@type) = 'icon'
   BEGIN
-  UPDATE tblappearance SET iconId = @iconId, iconUrl=@iconUrl  WHERE userId = @userId AND  [type]=LOWER(@type)
+  UPDATE tblappearance SET iconId = @iconId, iconUrl=@iconUrl, updatedAt =GETDATE()  WHERE userId = @userId AND  [type]=LOWER(@type)
   END
   ELSE
   BEGIN 
-  UPDATE tblappearance SET [data]=@data WHERE  userId = @userId AND  [type]= LOWER(@type)
+  UPDATE tblappearance SET [data]=LOWER(@data), updatedAt =GETDATE() WHERE  userId = @userId AND  [type]= LOWER(@type)
   END
   END
 COMMIT TRAN

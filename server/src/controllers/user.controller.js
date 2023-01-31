@@ -26,7 +26,8 @@ const { registerUser,
     updateUserInfor,
     userAppearance,
     getAppearance,
-    deleteAccount} = require("../services");
+    deleteAccount,
+    updateUserButton} = require("../services");
 const { APIError } = require("../utils/apiError");
 const { isValidEmail } = require("../utils/validation");
 const responseBuilder = require('../utils/responsBuilder');
@@ -383,43 +384,91 @@ exports.ctrlRemoveLinks = async(req, res, next) => {
         next(error);
     }
 }
+
 exports.ctrlButton = async (req, res, next) => {
     try {
-        const {type} = req.body;
+       
         if(!req.userId)
         return next(APIError.unauthenticated());
         if(!req.plan)
         return next(APIError.unauthorized());
-        if(!type)
-        return next(APIError.badRequest("Type is required"));
-
+       
         const details = {};
         for(key in req.body){
             details[key] = req.body[key];
         }
         if(details.length===0)
-        return next(APIError.badRequest())
-        const check=type.toLowerCase();
+        return next(APIError.badRequest("No data in request body"))
+       
         const plan=req.plan.toLowerCase();
         details.userId=req.userId;
-        if(check === ACTIONS.EMAIL){
-             if(!isValidEmail(details.data))
+        if(details.email){
+             if(!isValidEmail(details.email))
         next(APIError.badRequest(ERROR_FIELD.INVALID_EMAIL));
         }
-        if(check === ACTIONS.SOCIAL || 
-        check === ACTIONS.MUSIC || 
-        check === ACTIONS.PODCAST || 
-        check === ACTIONS.CONTACT)
-        if(
-        plan !== PLANS.PERSONAL ||
-         plan !== PLANS.ENTREPRENEUR){
-            infor =  PLANS.PERSONAL.charAt(0).toUpperCase() + PLANS.PERSONAL.slice(1);
-            return next(APIError.unauthenticated(`Upgrade plan to ${infor} Plan`))
-        }
-        details.type=check;
+        // if(check === ACTIONS.SOCIAL || 
+        // check === ACTIONS.MUSIC || 
+        // check === ACTIONS.PODCAST || 
+        // check === ACTIONS.CONTACT ||
+        // check === ACTIONS.PHONE ||
+        // check === ACTIONS.DISCORD ||
+        // check === ACTIONS.TELEGRAM)
+        // if(
+        // plan !== PLANS.PERSONAL ||
+        //  plan !== PLANS.ENTREPRENEUR){
+        //     infor =  PLANS.PERSONAL.charAt(0).toUpperCase() + PLANS.PERSONAL.slice(1);
+        //     return next(APIError.unauthenticated(`Upgrade plan to ${infor} Plan`))
+        // }
         details.plan=plan;
 
     const button = await userButton(details);
+    if(!button)
+    return next(APIError.customError(ERROR_FIELD.NOT_FOUND,404))
+    if(button.error)
+    return next(APIError.customError(button.error,400));
+    res.status(201).json(ACTIONS.COMPLETED);
+    } catch (error) {
+        next(error);
+    }
+}
+
+exports.ctrlUpdateButton = async (req, res, next) => {
+    try {
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        if(!req.plan)
+        return next(APIError.unauthorized());
+       
+        const details = {};
+        for(key in req.body){
+            details[key] = req.body[key];
+        }
+        if(!details.buttonId)
+        return next(APIError.badRequest("Button ID is required"))
+        if(details.length===0)
+        return next(APIError.badRequest("No update data in request body"))
+       
+        const plan=req.plan.toLowerCase();
+        details.userId=req.userId;
+        if(details.email){
+             if(!isValidEmail(details.email))
+        next(APIError.badRequest(ERROR_FIELD.INVALID_EMAIL));
+        }
+
+        // if(check === ACTIONS.SOCIAL || 
+        // check === ACTIONS.MUSIC || 
+        // check === ACTIONS.PODCAST || 
+        // check === ACTIONS.CONTACT ||
+        // check === ACTIONS.PHONE ||
+        // check === ACTIONS.DISCORD ||
+        // check === ACTIONS.TELEGRAM)
+        // if(
+        // plan !== PLANS.PERSONAL ||
+        //  plan !== PLANS.ENTREPRENEUR){
+        //     infor =  PLANS.PERSONAL.charAt(0).toUpperCase() + PLANS.PERSONAL.slice(1);
+        //     return next(APIError.unauthenticated(`Upgrade plan to ${infor} Plan`))
+        // } 
+    const button = await updateUserButton(details);
     if(!button)
     return next(APIError.customError(ERROR_FIELD.NOT_FOUND,404))
     if(button.error)
@@ -450,14 +499,17 @@ exports.ctrlGetButton = async (req, res, next) => {
 }
 exports.ctrlRemoveButton = async (req, res, next) => {
     try {
+        const{buttonId} = req.query;
         if(!req.userId)
         return next(APIError.unauthenticated());
-        const button = await removeUserButton(req.userId);
+        if(!buttonId)
+        return next(APIError.badRequest("Button ID is required"));
+        const button = await removeUserButton(req.userId,buttonId);
         if(!button)
         return next(APIError.customError(ERROR_FIELD.NOT_FOUND,404))
         if(button.error)
         return next(APIError.customError(button.error,400));
-    res.status(200).json(ACTIONS.COMPLETED);
+         res.status(200).json(ACTIONS.COMPLETED);
     } catch (error) {
         next(error);
     }

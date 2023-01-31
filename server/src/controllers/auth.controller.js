@@ -1,6 +1,6 @@
 const { compareSync, hashSync } = require("bcryptjs");
 const { getTokenSecrete, getRefreshTokenSecrete } = require("../config/env");
-const { getUsername, userExist, resetUserLogin, getCurrentPlan, createAdmin, defaultAccount, deleteAccount } = require("../services");
+const { getUsername, userExist, resetUserLogin, getCurrentPlan, defaultAccount, deleteAccount } = require("../services");
 const { APIError } = require("../utils/apiError");
 const jwt = require('jsonwebtoken');
 const responseBuilder = require('../utils/responsBuilder');

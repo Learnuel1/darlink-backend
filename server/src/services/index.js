@@ -3,8 +3,7 @@ const UserModule = require('./user.service');
 exports.registerUser = async (username, password, email, plan, role = 'user') => {
     return await UserModule.register(username, password, email, plan, role);
 }
-exports.getUsername = async (username) =>
-    UserModule.username(username);
+exports.getUsername = async (username) =>UserModule.username(username);
 exports.getCurrentPlan = async (userId) => UserModule.currentPlan(userId);
 exports.userExist = async (userId) => UserModule.checkUser(userId);
 exports.getUserbyEmail = async (email) => UserModule.userEmail(email);

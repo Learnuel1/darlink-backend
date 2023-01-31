@@ -16,7 +16,6 @@ const { registerUser,
     userButton,
     getUserButton,
     removeUserButton,
-    sendRecoverMail,
     getUserAccounts,
     passwordRecovery,
     getUserAccount,
@@ -33,10 +32,7 @@ const { isValidEmail } = require("../utils/validation");
 const responseBuilder = require('../utils/responsBuilder');
 const { cloudinary, accessPath } = require("../utils/cloudinary");
 const { ACTIONS, PLANS, ERROR_FIELD } = require("../utils/actions"); 
-const { recoveryPasswordMailHandler, registrationMailHandler, mailOptions, verificationMailHandler } = require("../utils/mailer");
-const nodemailer = require("nodemailer");
-const { mailAuth } = require("../utils/mail.auth");
-const  mailgun  = require("nodemailer-mailgun-transport");
+const { recoveryPasswordMailHandler, verificationMailHandler } = require("../utils/mailer");
 const {v4 : uuidv4 } =require("uuid");
 exports.ctrRegister =async(req,res,next)=>{
     try{
@@ -138,7 +134,6 @@ exports.ctrlUserProfile=async(req,res,next)=>{
         const colour= req.body.colour?req.body.colour:null;
         const details={displayName,location,colour,description};
         if(req.body.profileImage){
-            //store image
         const img=await    cloudinary.uploader.upload(req.body.profileImage,{
                 upload_preset:accessPath.preset(),
                 folder:accessPath.folder()
@@ -229,7 +224,6 @@ exports.ctrlPlan=async(req,res,next)=>{
 }
 exports.ctrlGetPlans=async(req,res,next)=>{
     try {
-         
     const plans = await getPlans();
     if(!plans)
     return next(APIError.customError("No plan exist",404));
@@ -331,7 +325,6 @@ exports.ctrlLink = async(req, res, next) => {
             }
         }
         if(req.body.dataFile){
-            //send file to cloude
              if(req.body.bgImage){
             const img=await    cloudinary.uploader.upload(req.body.dataFile,{
                 upload_preset:accessPath.preset(),

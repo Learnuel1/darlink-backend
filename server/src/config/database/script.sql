@@ -118,29 +118,66 @@ GO
 
 CREATE PROCEDURE sp_add_user_button
 @userId VARCHAR(255)
-,@buttonId VARCHAR(255)
-,@type VARCHAR(20)
-,@data VARCHAR(255)
+,@buttonId VARCHAR(255) 
+,@email VARCHAR(255)
+,@discord VARCHAR(255)
+,@telegram VARCHAR(255)
+,@contact VARCHAR(255)  
+,@phone VARCHAR(255)
+,@music VARCHAR(255)
+,@podcast VARCHAR(255)
+,@social VARCHAR(255)
+,@dataId VARCHAR(255)
+AS
+BEGIN
+BEGIN TRY
+BEGIN TRAN 
+  INSERT INTO tblbutton(buttonId, userId, email, discord, contact,phone,telegram, music, podcast,social) VALUES(@buttonId, @userId, @email, @discord, @contact,@phone,@telegram, @music, @podcast,@social);
+   
+COMMIT TRAN
+END TRY
+BEGIN CATCH
+ROLLBACK TRAN
+DECLARE @em VARCHAR(150)
+SET @em = ERROR_MESSAGE()
+RAISERROR(@em,16,1)
+END CATCH
+END
+GO
+
+CREATE PROCEDURE sp_update_user_button
+@userId VARCHAR(255)
+,@buttonId VARCHAR(255) 
+,@email VARCHAR(255)
+,@discord VARCHAR(255)
+,@telegram VARCHAR(255)
+,@contact VARCHAR(255)  
+,@phone VARCHAR(255)
+,@music VARCHAR(255)
+,@podcast VARCHAR(255)
+,@social VARCHAR(255)
 ,@dataId VARCHAR(255)
 AS
 BEGIN
 BEGIN TRY
 BEGIN TRAN
-IF LOWER(@type) = 'contact' OR LOWER(@type) = 'social' OR LOWER(@type) = 'podcast'
-BEGIN
-INSERT INTO tblbutton(buttonId, [data],[type], userId) VALUES(@buttonId, @data,@type,@userId)
-END
-ELSE IF LOWER(@type) = 'music'
-BEGIN
-INSERT INTO tblbutton(buttonId,[data],dataId,[type], userId) VALUES(@buttonId,@data,@dataId,@type,@userId)
-END
-ELSE IF LOWER(@type) = 'email'
-BEGIN
-INSERT INTO tblbutton(buttonId,[data],[type], userId) 
-VALUES(@buttonId,@data,@type,@userId)
-END
-ELSE
-RAISERROR('No button type found',16,1)
+  IF @email is NOT NULL OR @email !=' '
+  UPDATE  tblbutton SET email=@email ,updatedAt=GETDATE() WHERE buttonId=@buttonId AND userId=@userId;
+  IF @discord is NOT NULL OR  @discord  !=' ' 
+  UPDATE  tblbutton SET discord=@discord ,updatedAt=GETDATE() WHERE buttonId=@buttonId AND userId=@userId;
+  IF @contact is NOT NULL OR @contact !=' '
+  UPDATE  tblbutton SET contact=@contact ,updatedAt=GETDATE() WHERE buttonId=@buttonId AND userId=@userId
+  IF @phone is NOT NULL OR  @phone  !=' '
+  UPDATE  tblbutton SET phone=@phone ,updatedAt=GETDATE() WHERE buttonId=@buttonId AND userId=@userId
+  IF @telegram is NOT NULL OR @telegram !=' '
+ UPDATE  tblbutton SET telegram=@telegram ,updatedAt=GETDATE() WHERE buttonId=@buttonId AND userId=@userId
+  IF @music is NOT NULL OR @music !=' '
+ UPDATE  tblbutton SET music=@music,updatedAt=GETDATE()  WHERE buttonId=@buttonId AND userId=@userId
+  IF @podcast is NOT NULL OR @podcast !=' '
+ UPDATE  tblbutton SET podcast=@podcast ,updatedAt=GETDATE() WHERE buttonId=@buttonId AND userId=@userId
+  IF @social is NOT NULL OR  @social !=' '
+  UPDATE  tblbutton SET social=@social ,updatedAt=GETDATE() WHERE buttonId=@buttonId AND userId=@userId
+ 
 COMMIT TRAN
 END TRY
 BEGIN CATCH

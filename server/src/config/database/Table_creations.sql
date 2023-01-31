@@ -85,13 +85,19 @@ GO
 CREATE TABLE tblbutton(
     id INT NOT NULL IDENTITY(1,1)
     ,buttonId VARCHAR(255) NOT NULL
-    ,[type] VARCHAR(20) NOT NULL CHECK([type] IN ('email','discord','telegram','social','music','contact','podcast'))
-    ,[data] VARCHAR(255) NOT NULL
+    ,email VARCHAR(255)  NULL
+    ,discord VARCHAR(255)   NULL
+    ,telegram VARCHAR(255)   NULL
+    ,social VARCHAR(255)   NULL
+    ,music VARCHAR(255)   NULL
+    ,contact VARCHAR(255)   NULL
+    ,podcast VARCHAR(255)   NULL
+    ,phone VARCHAR(255)   NULL
     ,dataId VARCHAR(255) NULL
     ,userId VARCHAR(255) NOT NULL
     ,createdAt DATETIME NOT NULL DEFAULT GETDATE()
     ,updatedAt DATETIME NOT NULL DEFAULT GETDATE()
-    ,CONSTRAINT PK_button PRIMARY KEY(buttonId)
+    ,CONSTRAINT PK_button PRIMARY KEY(buttonId,userId)
     ,CONSTRAINT FK_buttonUser FOREIGN KEY(userId) REFERENCES tblusers(userId) ON DELETE CASCADE
 );
 GO

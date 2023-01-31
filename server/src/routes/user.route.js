@@ -16,6 +16,7 @@ userRoute.get('/resources',userRequired,Controller.userControl.ctrlGetLinks)
 userRoute.delete('/resources',userRequired,Controller.userControl.ctrlRemoveLinks)
 userRoute.post("/button",userRequired, userPlanRequired, Controller.userControl.ctrlButton)
 userRoute.get("/button",userRequired, Controller.userControl.ctrlGetButton)
+userRoute.patch("/button",userRequired,userPlanRequired, Controller.userControl.ctrlUpdateButton )
 userRoute.delete("/button",userRequired, Controller.userControl.ctrlRemoveButton)
 userRoute.post("/verification-link",userRequired,Controller.userControl.ctrlSendVerification)
 userRoute.get("/verify",Controller.userControl.ctrlVeifyUser);

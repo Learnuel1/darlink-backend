@@ -572,26 +572,96 @@ exports.removeLinks =async( userId,linkId)=>{
 
 exports.button = async(details) => {
   try{
-    let data,dataId;
+    let data,dataId,email,discord,telegram,social,music,contact,podcast,phone;
     if(details.dataId)
     dataId= details.dataId;
+    if(details.email)
+    email= details.email;
+    if(details.discord)
+    discord= details.discord;
+    if(details.telegram)
+    telegram= details.telegram;
+    if(details.social)
+    social= details.social;
+    if(details.music)
+    music= details.music;
+    if(details.contact)
+    contact= details.contact;
+    if(details.podcast)
+    podcast= details.podcast;
+    if(details.phone)
+    phone= details.phone;
+      
     const request = new sql.Request();
     request.input('userId', sql.VarChar(255), details.userId);
+    request.input('email', sql.VarChar(255), details.email);
+    request.input('discord', sql.VarChar(255), details.discord);
+    request.input('telegram', sql.VarChar(255), details.telegram);
+    request.input('social', sql.VarChar(255), details.social);
+    request.input('music', sql.VarChar(255), details.music);
+    request.input('contact', sql.VarChar(255), details.contact);
+    request.input('podcast', sql.VarChar(255), details.podcast);
+    request.input('phone', sql.VarChar(255), details.phone);
     request.input("buttonId", sql.VarChar(255), cuid());
-    request.input("type", sql.VarChar(20), details.type);
-    request.input("data", sql.VarChar(255), details.data);
     request.input("dataId", sql.VarChar(255), dataId);
     await request.execute(DB_ACTIONS.SP_ADD_USER_BUTTON).then(result => {
       if (result.rowsAffected > 0)
         data = result.rowsAffected[0];
     }).catch(err => {
       data = { error: err }
-    })
+    });
     return data;
   } catch (error) {
     return { error };
   }
 }
+
+exports.updateButton = async(details) => {
+  try{
+    let data,dataId,email,discord,telegram,social,music,contact,podcast,phone;
+    if(details.dataId)
+    dataId= details.dataId;
+    if(details.email)
+    email= details.email;
+    if(details.discord)
+    discord= details.discord;
+    if(details.telegram)
+    telegram= details.telegram;
+    if(details.social)
+    social= details.social;
+    if(details.music)
+    music= details.music;
+    if(details.contact)
+    contact= details.contact;
+    if(details.podcast)
+    podcast= details.podcast;
+    if(details.phone)
+    phone= details.phone;
+      
+    const request = new sql.Request();
+    request.input('userId', sql.VarChar(255), details.userId);
+    request.input('buttonId', sql.VarChar(255), details.buttonId);
+    request.input('email', sql.VarChar(255), details.email);
+    request.input('discord', sql.VarChar(255), details.discord);
+    request.input('telegram', sql.VarChar(255), details.telegram);
+    request.input('social', sql.VarChar(255), details.social);
+    request.input('music', sql.VarChar(255), details.music);
+    request.input('contact', sql.VarChar(255), details.contact);
+    request.input('podcast', sql.VarChar(255), details.podcast);
+    request.input('phone', sql.VarChar(255), details.phone);
+    request.input("dataId", sql.VarChar(255), dataId);
+    await request.execute(DB_ACTIONS.SP_UPDATE_USER_BUTTON).then(result => {
+      if (result.rowsAffected > 0 || result.rowsAffected.length>0)
+        data = result.rowsAffected[0];
+    }).catch(err => {
+      data = { error: err }
+    });
+    return data;
+  } catch (error) {
+    return { error };
+  }
+}
+
 exports.userButton = async(userId) => {
   try{
     let data;
@@ -608,12 +678,13 @@ exports.userButton = async(userId) => {
     return { error };
   }
 }
-exports.removeButton = async(userId) => {
+exports.removeButton = async(userId,buttonId) => {
   try{
     let data;
     const request = new sql.Request();
     request.input('userId', sql.VarChar(255), userId);
-    await request.query(`DELETE FROM tblbutton WHERE userId=@userId`).then(result => {
+    request.input('buttonId', sql.VarChar(255), buttonId);
+    await request.query(`DELETE FROM tblbutton WHERE userId=@userId AND buttonId=@buttonId`).then(result => {
       if (result.rowsAffected > 0)
         data = result.rowsAffected[0];
     }).catch(err => {

@@ -25,7 +25,7 @@ exports.getUserLinks = async (userId) => UserModule.links(userId);
 exports.removeUserLinks = async (userId,linkId) => UserModule.removeLinks(userId,linkId);
 exports.userButton = async (details) => UserModule.button(details);
 exports.getUserButton = async (userId) => UserModule.userButton(userId);
-exports.removeUserButton = async (userId) => UserModule.removeButton(userId);
+exports.removeUserButton = async (userId,buttonId) => UserModule.removeButton(userId,buttonId);
 exports.defaultAccount = async (details) => UserModule.defaultRegistration(details);
 exports.getUserAccounts = async (userId) => UserModule.userAccounts(userId);
 exports.passwordRecovery = async (id,userId, uniqueString, expiryTime) => UserModule.recoveryLink(id,userId, uniqueString, expiryTime);
@@ -37,3 +37,4 @@ exports.updateUserInfor = async (email,username, userId) => UserModule.updateInf
 exports.deleteAccount = async (userId) => UserModule.delete(userId);
 exports.userAppearance = async (infor) => UserModule.appearance(infor);
 exports.getAppearance = async (userId) => UserModule.userAppearance(userId);
+exports.updateUserButton = async (details)=> UserModule.updateButton(details);

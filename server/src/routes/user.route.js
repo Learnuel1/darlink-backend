@@ -1,7 +1,6 @@
 const express =require('express');
  
 const Controller = require('../controllers');
-const { errorMiddleWareModule } = require('../middlewares');
 const { userRequired, adminRequired, userPlanRequired } = require('../middlewares/auth.middleware');
 const userRoute=express.Router();
 userRoute.get("/forgot-password",Controller.userControl.ctrlFindUser);

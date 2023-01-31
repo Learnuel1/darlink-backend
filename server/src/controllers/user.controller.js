@@ -404,7 +404,7 @@ exports.ctrlButton = async (req, res, next) => {
         details.userId=req.userId;
         if(details.email){
              if(!isValidEmail(details.email))
-        next(APIError.badRequest(ERROR_FIELD.INVALID_EMAIL));
+      return  next(APIError.badRequest(ERROR_FIELD.INVALID_EMAIL));
         }
         // if(check === ACTIONS.SOCIAL || 
         // check === ACTIONS.MUSIC || 

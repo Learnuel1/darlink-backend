@@ -143,7 +143,7 @@ exports.ctrlDeleteAcctount = async (req, res, next) => {
         return next(APIError.unauthorized());
         if(!userId)
         return next(APIError.badRequest("Account id to delete is required"));
-        const delAccount = await  deleteAccount(req.userId);
+        const delAccount = await  deleteAccount(userId);
          if(!delAccount)
         return next(APIError.customError(ERROR_FIELD.NOT_FOUND,404));
         if(delAccount.error)

@@ -314,7 +314,7 @@ exports.profile = async (details) => {
     request.input(`colour`, sql.VarChar(255), colour);
     await request
       .query(
-        `IF (SELECT COUNT(Id) FROM tblprofile)=0 
+        `IF (SELECT COUNT(Id) FROM tblprofile WHERE userId = @userId)=0 
         BEGIN 
         INSERT INTO tblprofile(profileId,userId,bgId,bgUrl,passportId,
             passportUrl,
@@ -369,6 +369,9 @@ exports.getProfile = async (userId) => {
       .then((result) => {
         if (result.recordset.length > 0) {
           data = result.recordset[0];
+        }else if(result.rowsAffected.length >0){
+          data = result.recordset[0];
+
         }
       })
       .catch((err) => {

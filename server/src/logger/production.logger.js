@@ -1,22 +1,39 @@
 const { createLogger, format, transports } = require('winston');
-const { combine, timestamp, label, printf, prettyPrint } = format;
+require('winston-mongodb');
+const { combine, timestamp, label, printf, prettyPrint, errors ,json} = format;
 
-const myFormat = printf(({ level, message, timestamp }) => {
-  return `${timestamp} [${level}]   ${message}`;
-});
-
-
+ 
 exports.proLogger = () => {
  return createLogger({
   level: 'debug',
   format: combine( 
-    format.colorize(),
     timestamp(),
-    myFormat,
-    prettyPrint(), 
+    errors({stack:true}),
+    json(),
   ),
-  // defaultMeta: { service: 'user-service' },
-  transports: [new transports.Console()],
-  exceptionHandlers: [new transports.Console()]
+  transports: [
+    new transports.MongoDB(
+      {
+    level:"error",
+    collecion: "Darlink_error_log",
+    db: process.env.ERROR_LOG_URL,
+    options: { useUnifiedTopology: true },
+  }),
+  ],  
+  transports: [
+    new transports.MongoDB({
+    level:"infor",
+    collecion:"Darlink_infor_log",
+    db: process.env.ERROR_LOG_URL,
+    options: { useUnifiedTopology: true },
+  }),
+  ],  
+  exceptionHandlers: [new transports.MongoDB({
+    level:"debug",
+    collecion:"Darlink_exception_log",
+    db: process.env.ERROR_LOG_URL,
+    options: { useUnifiedTopology: true },
+  }),
+  ]
 })
-}
+} 

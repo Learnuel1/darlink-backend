@@ -5,8 +5,7 @@ let logger =null;
 
 if (process.env.NODE_ENV === 'dev') {
  logger = devLogger()
-}
-if (process.env.NODE_ENV === 'production') {
+}else {
  logger = proLogger()
 }
 

@@ -1,8 +1,9 @@
 const { createLogger, format, transports } = require('winston');
-const { combine, timestamp, label, printf, prettyPrint } = format;
+const { stack } = require('../app');
+const { combine, timestamp, label, printf, prettyPrint,errors } = format;
 
-const myFormat = printf(({ level, message, timestamp }) => {
-  return `${timestamp} [${level}]   ${message}`;
+const myFormat = printf(({ level, message, timestamp ,stack}) => {
+  return `${timestamp} [${level}]   ${stack || message}`;
 });
 
 
@@ -11,7 +12,8 @@ exports.devLogger = () => {
   level: 'debug',
   format: combine( 
     format.colorize(),
-    timestamp({format: "HH:mm:ss"}),
+    timestamp({format: "YYYY-MM-DD HH:mm:ss"}),
+   errors({stack:true}),
     myFormat, 
   ),
   // defaultMeta: { service: 'user-service' },

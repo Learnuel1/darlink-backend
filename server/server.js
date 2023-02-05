@@ -6,11 +6,10 @@ const { errorMiddleWareModule } = require('./src/middlewares');
 const { engine } =require ('express-handlebars');
 const logger = require('./src/logger');
 const PORT = getServerPort() || 3000;
-
 app.engine('.handlebars', engine({extname: '.handlebars'}));
 app.set('view engine', '.handlebars');
 app.set('views', '../src/views');
-
+ 
 app.use('/api/v1/',appRoute.routesRouter)
 
 app.all("*",errorMiddleWareModule.notFound );

@@ -164,12 +164,11 @@ exports.ctrlUserProfile=async(req,res,next)=>{
 }
 exports.ctlGetProfile=async(req,res,next)=>{
     try {
-        
         if(!req.userId)
         return next(APIError.unauthenticated());
         const profile = await getUserProfile(req.userId);
         if(!profile)
-        return res.status(404).json({error:"user does not exist"});
+        return next(APIError.customError("No profile exist",404))
         if(profile.error)
         return next(APIError.customError( profile.error,400));
       const data=  responseBuilder.buildProfile(profile);
@@ -187,7 +186,7 @@ exports.ctlGetProfiles=async(req,res,next)=>{
         return next(APIError.unauthorized());
         const profile = await getUserProfiles();
         if(!profile)
-        return next(APIError.customError("user does not exist",404));
+        return next(APIError.customError("No profile exist",404))
         if(profile.error)
         return next(APIError.customError(profile.error,400));
         const data= profile.map((item)=>{

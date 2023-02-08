@@ -12,6 +12,7 @@ exports.findUserAccount = async (infor) => UserModule.findAccount(infor);
 exports.getUserAccount = async (id, email) => UserModule.getAccount(id, email);
 exports.sendRecoverMail = async (details) => UserModule.recoverPassword(details);
 exports.uploadProfile = async (details) => UserModule.profile(details);
+exports.updateUserProfile = async (details) => UserModule.updateProfile(details);
 exports.getUserProfile = async (userId) => UserModule.getProfile(userId);
 exports.getUserProfiles = async () => UserModule.getProfiles();
 exports.getUserPlan = async (userId) => UserModule.userPlan(userId);

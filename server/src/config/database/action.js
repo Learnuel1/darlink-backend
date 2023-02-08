@@ -10,4 +10,5 @@ SP_RECOVERY_LINK: "sp_add_recovery_link",
 SP_RESET_PASSWORD_BY_LINK: "sp_reset_password_by_link",
 SP_VERIFY_USER: "sp_verify_user",
 SP_ADD_APPEARANCE: "sp_add_appearance",
+SP_ADD_PROFILE: "sp_add_profile",
 }

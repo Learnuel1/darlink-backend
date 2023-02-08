@@ -313,36 +313,68 @@ exports.profile = async (details) => {
     request.input(`location`, sql.VarChar(255), location);
     request.input(`colour`, sql.VarChar(255), colour);
     await request
+      .execute(DB_ACTIONS.SP_ADD_PROFILE)
+      .then((result) => {
+        if (result.rowsAffected > 0 || result.rowsAffected.length > 0) {
+          data = result.rowsAffected[0];
+        }
+      })
+      .catch((err) => {
+         data = { error: err.message || err };
+      });
+    return data ;
+  } catch (error) {
+    return { error };
+  }
+};
+ 
+exports.updateProfile = async (details) => {
+  try {
+    let data;
+    const userId = details.userId;
+    let bgId,
+      bgUrl,
+      passportId,
+      passportUrl,
+      displayName,
+      description,
+      location,
+      colour;
+    if (details.bgId) bgId = details.bgId;
+    if (details.bgUrl) bgUrl = details.bgUrl;
+    if (details.passportId) passportId = details.passportId;
+    if (details.passportUrl) passportUrl = details.passportUrl;
+    if (details.displayName) displayName = details.displayName;
+    if (details.description) description = details.description;
+    if (details.location) location = details.location;
+    if (details.colour) colour = details.colour;
+    const request = new sql.Request();
+    request.input(`userId`, sql.VarChar(255), userId);
+    request.input(`profileId`, sql.VarChar(255), cuid());
+    request.input(`bgId`, sql.VarChar(255), bgId);
+    request.input(`bgUrl`, sql.VarChar(255), bgUrl);
+    request.input(`passportId`, sql.VarChar(255), passportId);
+    request.input(`passportUrl`, sql.VarChar(255), passportUrl);
+    request.input(`displayName`, sql.VarChar(50), displayName);
+    request.input(`description`, sql.VarChar(255), description);
+    request.input(`location`, sql.VarChar(255), location);
+    request.input(`colour`, sql.VarChar(255), colour);
+    await request
       .query(
-        `IF (SELECT COUNT(Id) FROM tblprofile WHERE userId = @userId)=0 
-        BEGIN 
-        INSERT INTO tblprofile(profileId,userId,bgId,bgUrl,passportId,
-            passportUrl,
-            description, 
-            displayName,location,colour)
-             VALUES (@profileId,@userId,
-                @bgId,
-                @bgUrl,
-                @passportId,
-                @passportUrl,
-                @description, 
-                @displayName,
-                @location,@colour)
-            END
-           ELSE
-           BEGIN
-           UPDATE tblprofile SET
-           bgId=@bgId,
-           bgUrl=@bgUrl,
-           passportId=@passportId,
-           passportUrl=@passportUrl,
-           [description]=@description, 
-           displayName=@displayName,
-           location=@location,
-           colour=@colour,
-           updatedAt=GETDATE()
-            WHERE userId=@userId
-           END
+        ` IF @displayName !=' '
+        UPDATE tblprofile SET displayName = @displayName WHERE userId =@userId
+        IF @description IS NOT NULL
+        UPDATE tblprofile SET description = @description WHERE userId =@userId
+        IF @location IS NOT NULL
+        UPDATE tblprofile SET location = @location WHERE userId =@userId
+        IF @colour IS NOT NULL
+        UPDATE tblprofile SET colour = @colour WHERE userId =@userId
+        IF @bgUrl IS NOT NULL
+        UPDATE tblprofile SET bgUrl = @bgUrl, bgId =@bgId WHERE userId =@userId
+        IF @passportUrl IS NOT NULL
+        UPDATE tblprofile SET passportUrl = @passportUrl, passportId =@passportId WHERE userId =@userId
+
+        UPDATE tblprofile SET  updatedAt=GETDATE()
            `
       )
       .then((result) => {
@@ -351,7 +383,7 @@ exports.profile = async (details) => {
         }
       })
       .catch((err) => {
-        if (err) data = { error: err };
+      data = { error: err };
       });
     return data;
   } catch (error) {

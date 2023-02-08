@@ -27,7 +27,8 @@ const { registerUser,
     userAppearance,
     getAppearance,
     deleteAccount,
-    updateUserButton} = require("../services");
+    updateUserButton,
+    updateUserProfile} = require("../services");
 const { APIError } = require("../utils/apiError");
 const { isValidEmail } = require("../utils/validation");
 const responseBuilder = require('../utils/responsBuilder');
@@ -122,7 +123,6 @@ exports.ctrlFindUser=async(req,res,next)=>{
 }
 exports.ctrlUserProfile=async(req,res,next)=>{
     try {
-        
         const {displayName,description,location}=req.body;
         if(!req.userId)
         return next(APIError.unauthenticated());
@@ -143,7 +143,7 @@ exports.ctrlUserProfile=async(req,res,next)=>{
             details.passportUrl=img.secure_url;
         }
         if(req.body.bgImage){
-            const img=await    cloudinary.uploader.upload(req.body.bgImage,{
+            const img=await  cloudinary.uploader.upload(req.body.bgImage,{
                 upload_preset:accessPath.preset(),
                 folder:accessPath.folder()
             })
@@ -152,6 +152,44 @@ exports.ctrlUserProfile=async(req,res,next)=>{
         }
         details.userId=req.userId;
         const profile = await uploadProfile(details);
+        if(!profile)
+         return next(APIError.customError( "No profile found",404));
+        if(profile.error){
+         return res.status(400).json(profile.error)
+        } 
+         res.status(200).json({success:true,msg:`Profile created sucessfully`})
+
+    } catch (error) {
+        next(error)
+    }
+}
+exports.ctrlUpdateProfile=async(req,res,next)=>{
+    try {
+        
+        const details ={};
+        if(!req.userId)
+        return next(APIError.unauthenticated());
+        for(const key in req.body){
+            details[key] = req.body[key];
+        }
+        if(details.profileImage){
+        const img=await    cloudinary.uploader.upload(detail.profileImage,{
+                upload_preset:accessPath.preset(),
+                folder:accessPath.folder()
+            })
+            details.passportId=img.public_id;
+            details.passportUrl=img.secure_url;
+        }
+        if(details.bgImage){
+            const img=await    cloudinary.uploader.upload(details.bgImage,{
+                upload_preset:accessPath.preset(),
+                folder:accessPath.folder()
+            })
+            details.bgId=img.public_id;
+            details.bgUrl=img.secure_url;
+        }
+        details.userId=req.userId;
+        const profile = await updateUserProfile(details);
         if(!profile)
          return next(APIError.customError( "No profile found",400));
         if(profile.error)

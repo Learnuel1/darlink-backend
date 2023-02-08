@@ -301,3 +301,60 @@ SET @em = ERROR_MESSAGE()
 RAISERROR(@em,16,1)
 END CATCH
 END
+GO
+CREATE PROCEDURE sp_add_profile
+ @userId  VarChar(255), 
+   @profileId  VarChar(255), 
+   @bgId  VarChar(255), 
+   @bgUrl  VarChar(255), 
+    @passportId  VarChar(255), 
+    @passportUrl  VarChar(255), 
+    @displayName  VarChar(50),
+    @description  VarChar(255),  
+    @location  VarChar(255),  
+    @colour  VarChar(255)
+AS
+BEGIN
+BEGIN TRY
+BEGIN TRAN
+    IF (SELECT COUNT(Id) FROM tblprofile WHERE userId = @userId)>0 
+          RAISERROR('Profile already exist, update instead',16,1)
+    INSERT INTO tblprofile(profileId,userId,bgId,bgUrl,passportId,
+            passportUrl,
+            description, 
+            displayName,location,colour)
+             VALUES (@profileId,@userId,
+                @bgId,
+                @bgUrl,
+                @passportId,
+                @passportUrl,
+                @description, 
+                @displayName,
+                @location,@colour)
+COMMIT TRAN
+END TRY
+BEGIN CATCH
+ROLLBACK TRAN
+DECLARE @em VARCHAR(150)
+SET @em = ERROR_MESSAGE()
+RAISERROR(@em,16,1)
+END CATCH
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

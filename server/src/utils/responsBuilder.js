@@ -13,7 +13,7 @@ const commonReponse =(msg,data,field='data',others={}, op=true)=>{
     return response;
 }
 const buildProfile =(profileObj)=>{
-    const {id,userId,profileId,...data}=profileObj;
+    const {id,userId,...data}=profileObj;
     return data;
 }
 const buildPlan =(planObj)=>{

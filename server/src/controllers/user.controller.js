@@ -173,7 +173,7 @@ exports.ctrlUpdateProfile=async(req,res,next)=>{
             details[key] = req.body[key];
         }
         if(details.profileImage){
-        const img=await    cloudinary.uploader.upload(detail.profileImage,{
+        const img=await cloudinary.uploader.upload(details.profileImage,{
                 upload_preset:accessPath.preset(),
                 folder:accessPath.folder()
             })
@@ -181,7 +181,7 @@ exports.ctrlUpdateProfile=async(req,res,next)=>{
             details.passportUrl=img.secure_url;
         }
         if(details.bgImage){
-            const img=await    cloudinary.uploader.upload(details.bgImage,{
+            const img=await cloudinary.uploader.upload(details.bgImage,{
                 upload_preset:accessPath.preset(),
                 folder:accessPath.folder()
             })
@@ -570,7 +570,7 @@ exports.ctrlSendRecoverMail=async(req,res,next)=>{
     try {
         const {id,email}=req.query;
         if (!id)
-            return next(APIError.badRequest("use id is required", 404));
+            return next(APIError.badRequest("userId is required", 404));
         if (!email)
             return next(APIError.badRequest("Email is required", 404));
         const userExist = await getUserAccount(id, email);

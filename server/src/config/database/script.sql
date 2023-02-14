@@ -340,21 +340,20 @@ SET @em = ERROR_MESSAGE()
 RAISERROR(@em,16,1)
 END CATCH
 END
+GO
+CREATE PROCEDURE sp_send_recovery
+ @userId  VarChar(255)
+,@email  VarChar(255)
+AS
+BEGIN
+BEGIN TRY
+ SELECT * FROM tblusers WHERE email=@email AND userId=@userId
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+END TRY
+BEGIN CATCH
+ROLLBACK TRAN
+DECLARE @em VARCHAR(150)
+SET @em = ERROR_MESSAGE()
+RAISERROR(@em,16,1)
+END CATCH
+END

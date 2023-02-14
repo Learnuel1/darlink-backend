@@ -166,9 +166,9 @@ exports.getAccount = async (id,email) => {
     let data;
     const request = new sql.Request();
     request.input("email", sql.VarChar(40), email.trim());
-    // request.input("id", sql.VarChar(255),id.trim());
+     request.input("userId", sql.VarChar(255),id.trim());
     await request
-      .query(`SELECT * FROM tblusers WHERE email=@email AND userId=${id}`)
+      .execute(DB_ACTIONS.SP_SEND_RECOVERY )
       .then((result) => {
         if (result.recordset.length > 0) data = result.recordset[0];
       })

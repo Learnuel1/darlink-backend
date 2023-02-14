@@ -16,7 +16,7 @@ const handlebarsOptions = {
     viewPath : path.resolve("./src/views"),
     extName: ".handlebars",
 }
-var transporter =nodemailer.createTransport(mailgun(mailAuth)); 
+var transporter =nodemailer.createTransport( {...mailAuth}); 
 transporter.use("compile", hbs(handlebarsOptions))
 exports.mailOptions =(sendTo,subject,message)=>{
     return{

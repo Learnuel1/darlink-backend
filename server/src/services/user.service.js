@@ -1,7 +1,7 @@
 const { sql } = require("../config/database");
 const cuid = require("cuid");
 const { DB_ACTIONS } = require("../config/database/action");
-const { VarChar } = require("mssql");
+const { VarChar, Numeric } = require("mssql");
 
 exports.register = async (username, password, email,plan, role = "user") => {
   try {
@@ -166,9 +166,9 @@ exports.getAccount = async (id,email) => {
     let data;
     const request = new sql.Request();
     request.input("email", sql.VarChar(40), email.trim());
-    request.input("id", sql.Int,id);
+    request.input("id", sql.VarChar(255),id);
     await request
-      .query(`SELECT * FROM tblusers WHERE email=@email AND id=@id`)
+      .query(`SELECT * FROM tblusers WHERE email=@email AND userId=@id`)
       .then((result) => {
         if (result.recordset.length > 0) data = result.recordset[0];
       })

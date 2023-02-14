@@ -106,6 +106,7 @@ exports.ctrlFindUser=async(req,res,next)=>{
             if(useExist.error)
             return next(APIError.customError(useExist.error))
             details = responseBuilder.buildUser(useExist);
+            details.id=useExist.userId;
              return  res.status(200).json({success:true, msg:"found",user:details});
            
         }else if(data.email){
@@ -115,6 +116,7 @@ exports.ctrlFindUser=async(req,res,next)=>{
             if(useExist.error)
             return next(APIError.customError(useExist.error))
             details = responseBuilder.buildUser(useExist);
+            details.id=useExist.userId;
             return res.status(200).json({success:true, msg:"found",user:details});
         }
     } catch (error) {
@@ -573,6 +575,7 @@ exports.ctrlSendRecoverMail=async(req,res,next)=>{
             return next(APIError.badRequest("userId is required", 404));
         if (!email)
             return next(APIError.badRequest("Email is required", 404));
+       
         const userExist = await getUserAccount(id, email);
         if (!userExist)
             return next(APIError.customError("Account was not found", 404));

@@ -166,9 +166,9 @@ exports.getAccount = async (id,email) => {
     let data;
     const request = new sql.Request();
     request.input("email", sql.VarChar(40), email.trim());
-    request.input("id", sql.VarChar(255),id);
+    // request.input("id", sql.VarChar(255),id.trim());
     await request
-      .query(`SELECT * FROM tblusers WHERE email=@email AND userId=@id`)
+      .query(`SELECT * FROM tblusers WHERE email=@email AND userId=${id}`)
       .then((result) => {
         if (result.recordset.length > 0) data = result.recordset[0];
       })
@@ -178,6 +178,7 @@ exports.getAccount = async (id,email) => {
 
     return data;
   } catch (error) {
+    console.log(error)
     return { error: error };
   }
 };

@@ -178,7 +178,7 @@ exports.getAccount = async (id,email) => {
 
     return data;
   } catch (error) {
-    console.log(error)
+    if(error.message.includes("Invalid column name")) return {error:"Inalid ID format"}
     return { error: error };
   }
 };

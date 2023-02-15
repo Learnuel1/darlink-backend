@@ -1,6 +1,6 @@
 const { createLogger, format, transports } = require('winston');
 const { stack } = require('../app');
-const { combine, timestamp, label, printf, prettyPrint,errors } = format;
+const { combine, timestamp, printf,errors } = format;
 
 const myFormat = printf(({ level, message, timestamp ,stack}) => {
   return `${timestamp} [${level}]   ${stack || message}`;

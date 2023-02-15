@@ -6,9 +6,7 @@ const {urlencoded} = require('express');
 const { getFrontendOrigin } = require('./config/env');
 const CONFIG = require('./config');
 const expressWinston = require("express-winston");
-const logger = require('./logger');
 const ORIGIN = getFrontendOrigin();
-const expressWinston = require("express-winston");
 const logger = require('./logger');
 const app = express();
 app.use(cors({

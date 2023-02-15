@@ -5,6 +5,8 @@ const cookieparser=require('cookie-parser');
 const {urlencoded} = require('express');
 const { getFrontendOrigin } = require('./config/env');
 const CONFIG = require('./config');
+const expressWinston = require("express-winston");
+const logger = require('./logger');
 const ORIGIN = getFrontendOrigin();
 const app = express();
 app.use(cors({
@@ -12,7 +14,8 @@ app.use(cors({
     methods:['GET','PUT','POST','DELETE','PATCH'],
     credentials:true
 }));
- app.set("trust proxy",1)
+// app.use(expressWinston.logger(logger));
+app.set("trust proxy",1)
 app.use(morgan('dev'));
 app.use(cookieparser());
 app.disable('etag');//clear cache history to agitvoid error 304

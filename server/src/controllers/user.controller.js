@@ -36,6 +36,7 @@ const { cloudinary, accessPath } = require("../utils/cloudinary");
 const { ACTIONS, PLANS, ERROR_FIELD } = require("../utils/actions"); 
 const { recoveryPasswordMailHandler, verificationMailHandler } = require("../utils/mailer");
 const {v4 : uuidv4 } =require("uuid");
+const { logger } = require("express-winston");
 exports.ctrRegister =async(req,res,next)=>{
     try{
         const {username,password,email}=req.body;
@@ -593,6 +594,7 @@ exports.ctrlSendRecoverMail=async(req,res,next)=>{
         const result = await recoveryPasswordMailHandler(email, "30 minutes", uniqueString);
         if (result.error)
             return next(APIError.customError("Recovery mail failed to send", 400))
+        logger.info("Recovery mail sent successfully", {meta: "mail-service"})
         res.status(200).json({ ...result, id: uniqueString, msg: "Recovery mail sent successfully" })
     } catch (error) {
         next(error);
@@ -615,6 +617,7 @@ exports.ctrlVerifyReset = async (req, res, next) => {
             await removeRecoveryLink(id);
         return next(APIError.customError("Link expired",400));
         }
+        logger.info("Verify reset link successfully", {meta: "account-service"})
         res.status(200).json({success:true,id:check.uniqueString,msg:"Link is valid"})
     } catch (error) {
         return next(error);
@@ -636,7 +639,7 @@ exports.ctrlResetPassword =async(req,res,next)=>{
         return next(APIError.customError("Link does not exist",404));
         if(reset.error)
         return next(APIError.customError(reset.error,400))
-
+        logger.info("Reset password successfully", {meta: "auth-service"})
         res.status(200).json({success:true,msg:"Password reset successful"});
     } catch (error) {
         next(error)
@@ -659,6 +662,7 @@ exports.ctrlSendVerification =async (req, res, next) => {
         const result = await verificationMailHandler(req.email, "10 days", uniqueString, req.username);
         if (result.error)
             return next(APIError.customError("Recovery mail failed to send", 400))
+        logger.info("Verification mail sent successfully", {meta: "mail-service"})
         res.status(200).json({ ...result, id: uniqueString, msg: "Verification mail sent successfully" })
     } catch (error) {
         return next(error);
@@ -679,6 +683,7 @@ exports.ctrlVeifyUser =async (req, res, next) => {
         const currentTime = new Date();
         if(currentTime>check.expiryTime){
             await removeRecoveryLink(id);
+        logger.info("Expired link detected", {meta: "account-service"})
         return next(APIError.customError("Link expired",400));
         }
         const verify = await userVerification(id)
@@ -686,6 +691,8 @@ exports.ctrlVeifyUser =async (req, res, next) => {
         return next(APIError.customError("Invalid Link",404))
         if(verify.error)
         return next(APIError.customError("Verification failed, try again",400));
+        logger.info("Verification successful", {meta: "account-service"})
+
         res.status(200).json({success:true,msg:"Verification successful"})
     } catch (error) {
         return next(error);
@@ -708,7 +715,8 @@ exports.ctrlUpdateUserInfor = async (req, res, next) => {
       return next(APIError.customError(ERROR_FIELD.NOT_FOUND, 404))
     if(updated.error)
     return next(APIError.customError(updated.error,400));
-       res.status(200).json({success:true,msg:"Infor updated successfully"});
+    logger.info("Update user infor successfully", {meta: "account-service"})
+    res.status(200).json({success:true,msg:"Infor updated successfully"});
 
     } catch (error) {
         next(error);
@@ -741,7 +749,7 @@ exports.ctrlAppearance = async (req, res, next) => {
         return next(APIError.customError(ERROR_FIELD.NOT_FOUND,404));
         if(save.error)
         return next(APIError.customError(save.error,400));
-
+        logger.info("Appearance added successfully", {meta: "account-service"})
         res.status(200).json({success:true, msg: "Operation successful"});
     } catch (error) {
         next(error)
@@ -761,6 +769,7 @@ exports.ctrlGetAppearance = async (req, res, next ) => {
             return responseBuilder.buildPlan(cur);
         })
         const response  = responseBuilder.commonReponse("Found",data, "appearance");
+        logger.info("Appearance retrieved successfully", {meta: "account-service"})
         res.status(200).json(response);
     } catch (error) {
         next(error);
@@ -775,6 +784,7 @@ exports.ctrlDeleteAcctount = async (req, res, next) => {
         return next(APIError.customError(ERROR_FIELD.NOT_FOUND,404));
         if(delAccount.error)
         return next(APIError.customError(delAccount.error,400));
+        logger.info("Deleted account successfully", {meta: "account-service"})
         res.status(200).json({success:true, msg: "Account Deleted Successfully"});
     } catch (error) {
         next(error);

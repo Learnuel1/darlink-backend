@@ -123,3 +123,11 @@ CREATE TABLE tblappearance(
     ,CONSTRAINT PK_appearance PRIMARY KEY(appearanceId)
     ,CONSTRAINT FK_userAppearance FOREIGN KEY(userId) REFERENCES tblusers(userId) ON DELETE CASCADE
 ) 
+GO
+CREATE TABLE tblpreview(
+    id INT NOT NULL IDENTITY(1,1)
+    ,title varchar(255) NOT NULL
+    ,url VARCHAR(255) NOT NULL
+    ,createdAt DATETIME NOT NULL DEFAULT GETDATE()
+    ,updatedAt DATETIME NOT NULL DEFAULT GETDATE()
+)

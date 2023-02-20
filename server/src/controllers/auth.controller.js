@@ -29,6 +29,7 @@ exports.ctrLogin =async(req,res,next)=>{
         }else{ 
             payload = {id:exist.userId,role:exist.role};
         }
+        logger.info("Login successful",{meta:"auth-service"});
         const data = responseBuilder.buildUser(exist);
         const token = jwt.sign(payload,getTokenSecrete(),{expiresIn:'30m'});
         const refreshToken = jwt.sign(payload,getRefreshTokenSecrete(),{expiresIn:"60m"});
@@ -66,6 +67,7 @@ exports.ctrDefaultUser =async(req,res,next)=>{
         
         if(register.error)
         return next(APIError.customError(register.error,400));
+        logger.info("Account created Successfully",{meta:"account-service"});
         res.status(200).json({success:true,msg:"Account Created Successfully"});
     }catch(error){
         next(error);
@@ -81,7 +83,7 @@ exports.ctrLogout=async(req,res,next)=>{
         const exist = await userExist(payload.id);
         if(!exist)
         return next(APIError.customError("User does not exist"));
-
+        logger.info("Logged out successfully", {meta:"auth-service"});
         res.clearCookie('jwt');
         res.status(200).json({success:true,msg:"You have successfully logged out"});
 
@@ -112,7 +114,7 @@ exports.ctrlResetLogin =async(req,res,next)=>{
         return next(APIError.customError());
         if(reset.error)
         return next(APIError.customError(reset.error,400))
-
+        logger.info("Reset login successfully", {meta: "account-service"});
         res.status(200).json({success:true,msg:"Password reset successful"});
     } catch (error) {
         next(error)
@@ -148,6 +150,7 @@ exports.ctrlDeleteAcctount = async (req, res, next) => {
         return next(APIError.customError(ERROR_FIELD.NOT_FOUND,404));
         if(delAccount.error)
         return next(APIError.customError(delAccount.error,400));
+        logger.info("Account deleted successfully", {meta: "account-service"})
         res.status(200).json({success:true, msg: "Account Deleted Successfully"});
     } catch (error) {
         next(error);

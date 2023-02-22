@@ -12,4 +12,5 @@ SP_VERIFY_USER: "sp_verify_user",
 SP_ADD_APPEARANCE: "sp_add_appearance",
 SP_ADD_PROFILE: "sp_add_profile",
 SP_SEND_RECOVERY: "sp_send_recovery",
+SP_VERIFY_PROFILE: "sp_verify_user_preview",
 }

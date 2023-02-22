@@ -39,3 +39,4 @@ exports.deleteAccount = async (userId) => UserModule.delete(userId);
 exports.userAppearance = async (infor) => UserModule.appearance(infor);
 exports.getAppearance = async (userId) => UserModule.userAppearance(userId);
 exports.updateUserButton = async (details)=> UserModule.updateButton(details);
+exports.verifyUserProfile =async (username) => UserModule.verifyProfile(username);

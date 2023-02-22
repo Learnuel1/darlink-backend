@@ -396,7 +396,7 @@ exports.getProfile = async (userId) => {
   try {
     let data;
     const request = new sql.Request();
-    request.input("userId", sql.VarChar(255), userId);
+    request.input("userId", sql.VarChar(255), userId.trim());
     await request
       .query(`SELECT * FROM tblprofile WHERE userId=@userId`)
       .then((result) => {
@@ -912,4 +912,21 @@ exports.delete = async (userId) => {
   } catch (error) {
     return { error }
   }
+}
+
+exports.verifyProfile =async (username) => {
+  try {
+   let data; 
+   const request = new  sql.Request(); 
+   request.input('username',sql.VarChar(255),username);
+   await request.execute(DB_ACTIONS.SP_VERIFY_PROFILE).then(result => {
+     if(result.rowsAffected>0 || result.rowsAffected.length>0)
+     data= result.recordset[0];
+   }).catch(err =>{
+     data = {error:err};
+   })
+   return data;
+ } catch (error) {
+   return {error};
+ }
 }

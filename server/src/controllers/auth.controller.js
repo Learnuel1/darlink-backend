@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const responseBuilder = require('../utils/responsBuilder');
 const { ERROR_FIELD, ACTIONS } = require("../utils/actions");
 const { isValidEmail } = require("../utils/validation");
+const logger = require("../logger");
 
 exports.ctrLogin =async(req,res,next)=>{
     try {

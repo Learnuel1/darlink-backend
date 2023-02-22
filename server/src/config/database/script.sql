@@ -379,10 +379,9 @@ END
 
 GO
 
-CREATE PROCEDURE sp_get_preview
-@title VARCHAR(255)
-,@url VARCHAR(255)
+CREATE PROCEDURE sp_verify_user_preview
+@username VARCHAR(255)
 AS
 BEGIN
-  SELECT * FROM tblpreview WHERE Title=@title OR [url] =@url 
+  SELECT userId, username FROM tblusers WHERE username=@username
 END

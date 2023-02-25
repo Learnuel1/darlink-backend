@@ -596,7 +596,8 @@ exports.removeLinks =async( userId,linkId)=>{
         req.input("linkId",sql.VarChar(255),linkId)
         await req.query(`DELETE FROM tbllink WHERE userId=@userId AND linkId=@linkId`).then(result=>{
             if(result.rowsAffected>0)
-            data = result.rowsAffected[0]
+            data = result.rowsAffected[0];
+            else data={error:"No record found"};
         }).catch(err=>{
             data={error:err};
         });
@@ -723,6 +724,7 @@ exports.removeButton = async(userId,buttonId) => {
     await request.query(`DELETE FROM tblbutton WHERE userId=@userId AND buttonId=@buttonId`).then(result => {
       if (result.rowsAffected > 0)
         data = result.rowsAffected[0];
+        else data={error:"No record found"};
     }).catch(err => {
       data = { error: err }
     })
@@ -905,6 +907,7 @@ exports.delete = async (userId) => {
   await  request.query(`DELETE FROM tblusers WHERE id =@userid`).then(result => {
       if(result.rowsAffected.length>0)
       data = result.rowsAffected[0];
+    else data ={error:"No record found"};
     }).catch(err => {
       data = {eror: err};
     })

@@ -1,38 +1,34 @@
 const { createLogger, format, transports } = require("winston");
 require("winston-mongodb");
-const { combine, timestamp, errors, json , metadata, stack} = format;
+const { combine, timestamp, errors, json , metadata} = format;
 
 exports.proLogger = () => {
- return createLogger({
-  level: 'debug',
-  format: combine( 
-    timestamp(),
-    errors({stack:true}),
-    json(),
-  ),
-  transports: [
-    new transports.MongoDB(
-      {
-    level:"error",
-    collection: "Darlink_error_log",
-    db: process.env.ERROR_LOG_URL,
-    options: { useUnifiedTopology: true },
-  }),
-  ],  
-  transports: [
-    new transports.MongoDB({
-    level:"infor",
-    collection:"Darlink_infor_log",
-    db: process.env.ERROR_LOG_URL,
-    options: { useUnifiedTopology: true },
-  }),
-  ],  
-  exceptionHandlers: [new transports.MongoDB({
-    level:"debug",
-    collection:"Darlink_exception_log",
-    db: process.env.ERROR_LOG_URL,
-    options: { useUnifiedTopology: true },
-  }),
-  ]
-})
-} 
+  return createLogger({
+    format: combine(
+      json(),
+      timestamp(), 
+      errors({ stack: true }),
+      metadata()),
+    defaultMeta: { service: "user-service" },
+    transports: [
+      new transports.MongoDB({
+        level: "error",
+        collection: "darlink_error_log",
+        db: process.env.ERROR_LOG_URL,
+        options: { useUnifiedTopology: true },
+      }),
+      new transports.MongoDB({
+        level: "info",
+        collection: "darlink_infor_log",
+        db: process.env.ERROR_LOG_URL,
+        options: { useUnifiedTopology: true },
+      }),
+      new transports.MongoDB({
+        level: "debug",
+        collection: "darlink_exception_log",
+        db: process.env.ERROR_LOG_URL,
+        options: { useUnifiedTopology: true },
+      }),
+    ],
+  });
+};

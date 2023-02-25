@@ -35,8 +35,8 @@ const responseBuilder = require('../utils/responsBuilder');
 const { cloudinary, accessPath } = require("../utils/cloudinary");
 const { ACTIONS, PLANS, ERROR_FIELD } = require("../utils/actions"); 
 const { recoveryPasswordMailHandler, verificationMailHandler } = require("../utils/mailer");
-const {v4 : uuidv4 } =require("uuid");
-const { logger } = require("express-winston");
+const {v4 : uuidv4 } =require("uuid"); 
+const logger = require("../logger");
 exports.ctrRegister =async(req,res,next)=>{
     try{
         const {username,password,email}=req.body;
@@ -784,7 +784,7 @@ exports.ctrlDeleteAcctount = async (req, res, next) => {
         return next(APIError.customError(ERROR_FIELD.NOT_FOUND,404));
         if(delAccount.error)
         return next(APIError.customError(delAccount.error,400));
-        logger.info("Deleted account successfully", {meta: "account-service"})
+         logger.info("Deleted account successfully", {meta: "account-service"})
         res.status(200).json({success:true, msg: "Account Deleted Successfully"});
     } catch (error) {
         next(error);

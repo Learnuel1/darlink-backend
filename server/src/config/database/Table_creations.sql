@@ -123,15 +123,3 @@ CREATE TABLE tblappearance(
     ,CONSTRAINT PK_appearance PRIMARY KEY(appearanceId)
     ,CONSTRAINT FK_userAppearance FOREIGN KEY(userId) REFERENCES tblusers(userId) ON DELETE CASCADE
 ) 
-GO
-CREATE TABLE tblpreview(
-    id INT NOT NULL IDENTITY(1,1)
-    ,previewId VARCHAR(255) NOT NULL
-    ,title varchar(255) NOT NULL
-    ,[url] VARCHAR(255) NOT NULL UNIQUE
-    ,userId varchar(255) NOT NULL
-    ,createdAt DATETIME NOT NULL DEFAULT GETDATE()
-    ,updatedAt DATETIME NOT NULL DEFAULT GETDATE()
-    ,CONSTRAINT PK_preview PRIMARY KEY(previewId)
-    ,CONSTRAINT FK_preview FOREIGN KEY(userId) REFERENCES tblusers(UserId) ON DELETE CASCADE
-)

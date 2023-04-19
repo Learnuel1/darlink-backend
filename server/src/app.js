@@ -25,4 +25,4 @@ app.use("/api/v1/status",(req,res)=>{
     res.send({msg:`Yes!... Welcome to ${CONFIG.APP_NAME} API`});
 })
 
-module.exports=app;"clekcgk1f0003k0z08x3e7ycg"
+module.exports=app;

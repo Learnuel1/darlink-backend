@@ -18,6 +18,6 @@ exports.devLogger = () => {
     ),
     // defaultMeta: { service: 'user-service' },
     transports: [new transports.Console()],
-    exceptionHandlers: [new transports.Console()],
+    // exceptionHandlers: [new transports.Console()],
   });
 };

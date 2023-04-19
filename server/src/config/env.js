@@ -10,4 +10,5 @@ module.exports ={
      getFrontendOrigin:()=>process.env.FRONTEND_ORIGIN_URL,
     getRefreshTokenSecrete:()=>process.env.REFRESH_TOKEN_SECRETE,
     getTokenSecrete:()=>process.env.TOKEN_TOKEN_SECRETE,
+    getPaystackSecreteKey:()=> process.env.PAYSTACK_SECRET_KEY,
 }

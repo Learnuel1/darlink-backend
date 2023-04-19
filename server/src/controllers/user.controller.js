@@ -28,7 +28,8 @@ const { registerUser,
     getAppearance,
     deleteAccount,
     updateUserButton,
-    updateUserProfile} = require("../services");
+    updateUserProfile,
+    getPlanById} = require("../services");
 const { APIError } = require("../utils/apiError");
 const { isValidEmail } = require("../utils/validation");
 const responseBuilder = require('../utils/responsBuilder');
@@ -266,6 +267,25 @@ exports.ctrlPlan=async(req,res,next)=>{
 exports.ctrlGetPlans=async(req,res,next)=>{
     try {
     const plans = await getPlans();
+    if(!plans)
+    return next(APIError.customError("No plan exist",404));
+    if(plans.error)
+    return next(APIError.customError(plans.error,400));
+    const data = plans.map((item)=>{
+        return responseBuilder.buildPlan(item);
+    })
+    const response= responseBuilder.commonReponse("Found",data,"plans");
+    res.status(200).json(response);
+    } catch (error) {
+        next(error);
+    }
+}
+exports.ctrlGetPlanById=async(req,res,next)=>{
+    try {
+        const {planId} = req.query;
+        if (!planId) return next(APIError.badRequest("Plan ID is required"));
+
+    const plans = await getPlanById(planId);
     if(!plans)
     return next(APIError.customError("No plan exist",404));
     if(plans.error)

@@ -1,4 +1,5 @@
 const UserModule = require('./user.service');
+const PlanModule = require("./plan.service");
 
 exports.registerUser = async (username, password, email, plan, role = 'user') => {
     return await UserModule.register(username, password, email, plan, role);
@@ -19,6 +20,7 @@ exports.getUserPlan = async (userId) => UserModule.userPlan(userId);
 exports.createAdmin = async (details) => UserModule.create(details);
 exports.plans = async (details) => UserModule.plan(details);
 exports.getPlans = async () => UserModule.plans();
+exports.getPlanById = async (id) => UserModule.planById(id);
 exports.deletePlan = async (planId) => UserModule.deletePlan(planId);
 exports.updatePlan = async (details) => UserModule.updatePlan(details);
 exports.userProfileLink = async (details) => UserModule.profileLink(details);
@@ -40,3 +42,6 @@ exports.userAppearance = async (infor) => UserModule.appearance(infor);
 exports.getAppearance = async (userId) => UserModule.userAppearance(userId);
 exports.updateUserButton = async (details)=> UserModule.updateButton(details);
 exports.verifyUserProfile =async (username) => UserModule.verifyProfile(username);
+
+// plan section
+exports.upgradePlan = async (infor) => PlanModule.planPayment(infor);

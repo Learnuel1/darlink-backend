@@ -489,6 +489,22 @@ exports.plans =async( )=>{
         return {error};
     }
 }
+exports.planById =async(id)=>{
+    try {
+        let data;
+        const req = new sql.Request();
+        req.input("planId", sql.VarChar(255), id); 
+        await req.query(`SELECT * FROM tblplan WHERE planId =@planId`).then(result=>{
+            if(result.recordset.length>0)
+            data = result.recordset
+        }).catch(err=>{
+            data={error:err};
+        });
+        return data;
+    } catch (error) {
+        return {error};
+    }
+}
 exports.deletePlan = async (planId) => {
     try {
       let data;

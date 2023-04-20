@@ -11,12 +11,13 @@ exports.planPayment = async (payInfor) => {
   }
 }
 
- exports.tempReference = async (id, planId) => {
+ exports.tempReference = async (id, planId,userId) => {
   
   let exist;
   const request = new sql.Request();
   request.input("id", sql.VarChar(255), id);
   request.input("planId", sql.VarChar(255), planId);
+  request.input("userId", sql.VarChar(255), userId);
   await request
     .execute(DB_ACTIONS.SP_TEMP_REFERENCE)
     .then((result) => {
@@ -31,7 +32,7 @@ exports.findTempReference = async(reference) =>{
     let data;
     const request = new sql.Request();
     request.input("id", sql.VarChar(255), reference);
-  await  request.query(`SELECT FROM tbltemp_reference WHERE id =@id`).then(result => {
+  await  request.query(`SELECT * FROM tbltemp_reference WHERE id =@id`).then(result => {
       if(result.recordset.length>0)
       data = result.recordset;
     }).catch( err => {

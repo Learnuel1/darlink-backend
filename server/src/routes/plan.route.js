@@ -9,7 +9,7 @@ planRoute.post('/',adminRequired, Controller.userControl.ctrlPlan)
 planRoute.delete('/',adminRequired, Controller.userControl.ctrlDelatePlan)
 planRoute.put('/',adminRequired,Controller.userControl.ctrlUpdatePlan)
 planRoute.post("/upgrade", userRequired, Controller.planController.ctrlPlanUpgrade);
-planRoute.post("/payment-successful", Controller.planController.paymentCompleted);
+planRoute.get("/payment-successful", Controller.planController.paymentCompleted);
 planRoute.get('/user-plan',userRequired, Controller.userControl.ctrlGetUserPlans)
 
 module.exports={

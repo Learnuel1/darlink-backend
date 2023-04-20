@@ -60,21 +60,22 @@ exports.paymentCompleted = async (req, res, next) => {
       if(event.status === "success"){
         // send info to database
         const temPlan = await getTempReference(event.reference);
+        logger.info("Temporal reference id retrieved", {meta:"Paystack-service"});
         if(!temPlan || temPlan.error){
           logger.info("Payment hacked successfully", {meta:"Paystack-service"});
         }else{
           
           const userPlan = await getUserPlan(temPlan.userId);
+          const plan = await    getPlanById(temPlan.planId);
           if(!userPlan || userPlan.error) {
             logger.error("Paid plan update failed", {meta:"paystack-plan-service"});
           }
-          const plan = await  getPlanById(temPlan.planId);
-          if(!plan || plan.error) {
+          else if(!plan || plan.error) {
             logger.error("Paid plan update failed", {meta:"paystack-plan-service"});
           }
           // update user plan info
           const upgradePlanInfor = {
-            planId:plan.planId,
+            planId: plan.planId,
             userId: temPlan.userId,
             plan: plan.plan,
             amount: plan.amount,
@@ -84,13 +85,12 @@ exports.paymentCompleted = async (req, res, next) => {
           }
           const finalize = await finalizePlanUpgrade(upgradePlanInfor);
           if(!finalize || finalize.error){
-            logger.error("Plan upgrade failed", {meta:"paystack-plan-service"});
+            logger.error("Plan final upgrade failed", {meta:"paystack-plan-service"});
           }else{
             //send email to customer
             logger.info("Plan upgraded successfully", {meta: "Plan-service"});
           }
         }
-        console.log(event);
       }
     }else{
         logger.info("Payment hack detected", {meta:"Paystack-server"});

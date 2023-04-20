@@ -178,7 +178,7 @@ exports.getAccount = async (id,email) => {
 
     return data;
   } catch (error) {
-    if(error.message.includes("Invalid column name")) return {error:"Inalid ID format"}
+    if(error.message.includes("Invalid column name")) return {error:"Invalid ID format"}
     return { error: error };
   }
 };

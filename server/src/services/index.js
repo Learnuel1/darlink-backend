@@ -45,3 +45,4 @@ exports.verifyUserProfile =async (username) => UserModule.verifyProfile(username
 
 // plan section
 exports.upgradePlan = async (infor) => PlanModule.planPayment(infor);
+exports.generateTempRef = async(id, planId) => PlanModule.tempReference(id, planId);

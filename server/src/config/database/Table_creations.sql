@@ -109,7 +109,7 @@ CREATE TABLE tblpassword_recovery(
     ,expiryTime DATETIME NOT NULL 
     ,createdAt DATETIME NOT NULL DEFAULT GETDATE()
 )
-
+GO
 CREATE TABLE tblappearance(
     id INT NOT NULL IDENTITY(1,1)
     ,appearanceId VARCHAR(255) NOT NULL
@@ -122,4 +122,12 @@ CREATE TABLE tblappearance(
     ,updatedAt DATETIME NOT NULL DEFAULT GETDATE()
     ,CONSTRAINT PK_appearance PRIMARY KEY(appearanceId)
     ,CONSTRAINT FK_userAppearance FOREIGN KEY(userId) REFERENCES tblusers(userId) ON DELETE CASCADE
-) 
+)
+GO
+CREATE TABLE tbltemp_reference (
+     id varchar(255) NOT NULL
+     ,planId VARCHAR(255) NOT NULL
+     ,createdAt DATETIME NOT NULL DEFAULT GETDATE()
+    ,CONSTRAINT PK_temp_reference PRIMARY KEY(id, planId)
+    ,CONSTRAINT FK_temp_referencePlan FOREIGN KEY(planId) REFERENCES tblplan(planId) ON DELETE CASCADE
+)

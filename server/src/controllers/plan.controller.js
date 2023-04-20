@@ -2,7 +2,7 @@ const { getPaystackSecreteKey } = require("../config/env");
 const logger = require("../logger");
 const { getPlanById, generateTempRef, getTempReference, getUserPlan, finalizePlanUpgrade } = require("../services");
 const { APIError } = require("../utils/apiError");
-const options = require("../utils/paystack.auth");
+const {options} = require("../utils/paystack.auth");
 
 
 exports.ctrlPlanUpgrade = async ( req, res, next) => {

@@ -1,8 +1,9 @@
+
 // const sql =require('mssql/msnodesqlv8');//disable for local dev db
 const logger = require('../../logger');
 const sql =require('mssql');//enable for local db dev
 const {  getDB_NAME, getDB_PWD, getDB_USER, getDB_SERVER } = require('../env');
- 
+
 const DB=getDB_NAME();
 const SERVER_NAME =getDB_SERVER();
 const sqlConfig = {
@@ -41,3 +42,4 @@ module.exports={
     sql,
     appPool,
 }
+

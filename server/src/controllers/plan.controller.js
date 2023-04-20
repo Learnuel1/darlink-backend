@@ -54,17 +54,17 @@ exports.paymentCompleted = async (req, res, next) => {
     // verify request origin
     if (hash == req.headers['x-paystack-signature']) {
       // Retrieve the request's body
-       logger.info("Payment authorized successfully", {meta:"Paystack-service"});
+       logger.info("Payment authorization confirmed", {meta:"Paystack-service"});
       const event = req.body.data;
       // check response status
       if(event.status === "success"){
         // send info to database
         let temPlan = await getTempReference(event.reference);
-       
-        logger.info("Temporal reference id retrieved", {meta:"Paystack-service"});
+       console.log(event.reference)
         if(!temPlan || temPlan.error){
-          logger.info("Payment hacked successfully", {meta:"Paystack-service"});
+          logger.info("Temporal reference retrieval failed", {meta:"paystack-plan-service"});
         }else{
+          logger.info("Temporal reference id retrieved", {meta:"paystack-plan-service"});
           temPlan = temPlan[0];
           let userPlan = await getUserPlan(temPlan.userId);
           let plan = await   getPlanById(temPlan.planId);

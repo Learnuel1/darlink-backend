@@ -14,4 +14,5 @@ SP_ADD_PROFILE: "sp_add_profile",
 SP_SEND_RECOVERY: "sp_send_recovery",
 SP_VERIFY_PROFILE: "sp_verify_user_preview",
 SP_TEMP_REFERENCE: "sp_temp_reference",
+SP_UPGRADE_USER_PLAN: "sp_upgrade_user_plan",
 }

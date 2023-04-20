@@ -390,11 +390,12 @@ GO
 CREATE PROCEDURE sp_temp_reference
 @id VARCHAR(255)
 ,@planId VARCHAR(255)
+,@userId VARCHAR(255)
 AS
 BEGIN
 BEGIN TRY
 BEGIN TRAN
-INSERT INTO tbltemp_reference(id, planId) VALUES(@id, @planId)
+INSERT INTO tbltemp_reference(id, planId,userId) VALUES(@id, @planId,@userId)
 COMMIT TRAN
 END TRY
 BEGIN CATCH
@@ -404,3 +405,31 @@ SET @em = ERROR_MESSAGE()
 RAISERROR(@em,16,1)
 END CATCH
 END
+GO
+
+CREATE PROCEDURE sp_upgrade_user_plan
+@userPlanId VARCHAR(255)
+,@planId VARCHAR(255)
+,@userId VARCHAR(255)
+,@plan VARCHAR(60)
+,@amount DECIMAL(9,2)
+,@duration VARCHAR(10)
+,@startDate DATE
+,@endDate DATE
+AS
+BEGIN
+BEGIN TRY
+BEGIN TRAN
+   
+UPDATE tbluserplan SET [planId]=@planId, [plan]=@plan, amount =@amount, startDate=@startDate, endDate=@endDate, updatedAt=GETDATE()
+WHERE userPlanId=@userPlanId AND userId =@userId;  
+COMMIT TRAN
+END TRY
+BEGIN CATCH
+ROLLBACK TRAN
+DECLARE @em VARCHAR(150)
+SET @em = ERROR_MESSAGE()
+RAISERROR(@em,16,1)
+END CATCH
+END 
+GO

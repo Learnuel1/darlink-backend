@@ -341,6 +341,7 @@ RAISERROR(@em,16,1)
 END CATCH
 END
 GO
+
 CREATE PROCEDURE sp_send_recovery
  @userId  VarChar(255)
 ,@email  VarChar(255)
@@ -350,8 +351,7 @@ BEGIN TRY
  SELECT * FROM tblusers WHERE email=@email AND userId=@userId
 
 END TRY
-BEGIN CATCH
-ROLLBACK TRAN
+BEGIN CATCH 
 DECLARE @em VARCHAR(150)
 SET @em = ERROR_MESSAGE()
 RAISERROR(@em,16,1)
@@ -384,4 +384,23 @@ CREATE PROCEDURE sp_verify_user_preview
 AS
 BEGIN
   SELECT userId, username FROM tblusers WHERE username=@username
+END
+GO
+
+CREATE PROCEDURE sp_temp_reference
+@id VARCHAR(255)
+,@planId VARCHAR(255)
+AS
+BEGIN
+BEGIN TRY
+BEGIN TRAN
+INSERT INTO tbltemp_reference(id, planId) VALUES(@id, @planId)
+COMMIT TRAN
+END TRY
+BEGIN CATCH
+ROLLBACK TRAN
+DECLARE @em VARCHAR(150)
+SET @em = ERROR_MESSAGE()
+RAISERROR(@em,16,1)
+END CATCH
 END

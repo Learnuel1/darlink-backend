@@ -51,16 +51,13 @@ exports.paymentCompleted = async (req, res, next) => {
     const secret = getPaystackSecreteKey(); 
       //validate event
       const hash = crypto.createHmac('sha512', secret).update(JSON.stringify(req.body)).digest('hex'); 
-      console.log(hash)
     // verify request origin
     if (hash == req.headers['x-paystack-signature']) {
       // Retrieve the request's body
-      logger.info("Payment authorization confirmed", {meta:"Paystack-service"});
-      const {reference} = req.query;
-      console.log(reference);
+       logger.info("Payment authorized successfully", {meta:"Paystack-service"});
       const event = req.body.data;
       // check response status
-      // if(event.status === "success"){
+      if(event.status === "success"){
         // send info to database
         const temPlan = await getTempReference(event.reference);
         if(!temPlan || temPlan.error){
@@ -95,9 +92,9 @@ exports.paymentCompleted = async (req, res, next) => {
         }
         console.log(event);
       }
-    // }else{
-        // logger.info("Payment hack detected", {meta:"Paystack-server"});
-      // }
+    }else{
+        logger.info("Payment hack detected", {meta:"Paystack-server"});
+      }
   }catch(error){
     next(error);
   }

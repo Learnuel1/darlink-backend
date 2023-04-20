@@ -127,7 +127,9 @@ GO
 CREATE TABLE tbltemp_reference (
      id varchar(255) NOT NULL
      ,planId VARCHAR(255) NOT NULL
+     ,userId VARCHAR(255) NOT NULL
      ,createdAt DATETIME NOT NULL DEFAULT GETDATE()
     ,CONSTRAINT PK_temp_reference PRIMARY KEY(id, planId)
     ,CONSTRAINT FK_temp_referencePlan FOREIGN KEY(planId) REFERENCES tblplan(planId) ON DELETE CASCADE
+    ,CONSTRAINT FK_temp_referenceUser FOREIGN KEY(userId) REFERENCES tblusers(UserId) ON DELETE CASCADE
 )

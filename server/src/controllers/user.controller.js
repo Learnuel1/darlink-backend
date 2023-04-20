@@ -303,7 +303,6 @@ exports.ctrlGetUserPlans=async(req,res,next)=>{
     try {
     if(!req.userId)
     return next(APIError.unauthenticated());
-
     const plan = await getUserPlan(req.userId)
     if(!plan)
     return next(APIError.customError("No plan exist for this account",404));

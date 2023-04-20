@@ -54,6 +54,7 @@ exports.upGradeCompletion = async(details)=>{
         const req = new sql.Request();
         req.input("userPlanId",sql.VarChar,details.userPlanId)
         req.input("planId",sql.VarChar,details.planId)
+        req.input("refId",sql.VarChar,details.refId)
         req.input("userId",sql.VarChar,details.userId.trim())
         req.input("plan",sql.VarChar,details.plan.trim())
         req.input("amount",sql.Decimal,details.amount.trim())

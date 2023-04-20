@@ -77,6 +77,7 @@ exports.paymentCompleted = async (req, res, next) => {
             userId: temPlan.userId,
             plan: plan.plan,
             amount: plan.amount,
+            refId:temPlan.id,
             userPlanId: userPlan.userPlanId,
             startDate: Date.now(),
           }

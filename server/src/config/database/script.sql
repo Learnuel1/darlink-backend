@@ -411,6 +411,7 @@ CREATE PROCEDURE sp_upgrade_user_plan
 @userPlanId VARCHAR(255)
 ,@planId VARCHAR(255)
 ,@userId VARCHAR(255)
+,@refId VARCHAR(255)
 ,@plan VARCHAR(60)
 ,@amount DECIMAL(9,2)
 ,@duration VARCHAR(10)
@@ -423,6 +424,7 @@ BEGIN TRAN
    
 UPDATE tbluserplan SET [planId]=@planId, [plan]=@plan, amount =@amount, startDate=@startDate, endDate=@endDate, updatedAt=GETDATE()
 WHERE userPlanId=@userPlanId AND userId =@userId;  
+DELETE FROM tbltemp_reference WHERE id=@refId
 COMMIT TRAN
 END TRY
 BEGIN CATCH

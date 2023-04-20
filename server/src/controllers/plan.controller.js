@@ -59,21 +59,24 @@ exports.paymentCompleted = async (req, res, next) => {
       // check response status
       if(event.status === "success"){
         // send info to database
-        const temPlan = await getTempReference(event.reference);
+        let temPlan = await getTempReference(event.reference);
+       
         logger.info("Temporal reference id retrieved", {meta:"Paystack-service"});
         if(!temPlan || temPlan.error){
           logger.info("Payment hacked successfully", {meta:"Paystack-service"});
         }else{
-          
-          const userPlan = await getUserPlan(temPlan.userId);
-          const plan = await    getPlanById(temPlan.planId);
+          temPlan = temPlan[0];
+          let userPlan = await getUserPlan(temPlan.userId);
+          let plan = await   getPlanById(temPlan.planId);
           if(!userPlan || userPlan.error) {
             logger.error("Paid plan update failed", {meta:"paystack-plan-service"});
           }
           else if(!plan || plan.error) {
+            userPlan =userPlan[0];
             logger.error("Paid plan update failed", {meta:"paystack-plan-service"});
           }
           // update user plan info
+          plan = plan[0];
           const upgradePlanInfor = {
             planId: plan.planId,
             userId: temPlan.userId,

@@ -56,12 +56,14 @@ exports.paymentCompleted = async (req, res, next) => {
       // Retrieve the request's body
        logger.info("Payment authorization confirmed", {meta:"Paystack-service"});
       const event = req.body.data;
+      logger.info(event);
       // check response status
       if(event.status === "success"){
         // send info to database
         let temPlan = await getTempReference(event.reference);
-       console.log(event.reference)
+       console.log(temPlan)
         if(!temPlan || temPlan.error){
+          APIError.customError("Temporal reference failed",400);
           logger.info("Temporal reference retrieval failed", {meta:"paystack-plan-service"});
         }else{
           logger.info("Temporal reference id retrieved", {meta:"paystack-plan-service"});

@@ -33,7 +33,7 @@ exports.findTempReference = async(reference) =>{
     const request = new sql.Request();
     request.input("id", sql.VarChar(255), reference);
   await  request.query(`SELECT * FROM tbltemp_reference WHERE id =@id`).then(result => {
-      if(result.recordset.length>0)
+      if(result.recordset.length >0)
       data = result.recordset;
     }).catch( err => {
       data = { error : err};

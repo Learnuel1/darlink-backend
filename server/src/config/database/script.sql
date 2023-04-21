@@ -415,7 +415,7 @@ CREATE PROCEDURE sp_upgrade_user_plan
 ,@plan VARCHAR(60)
 ,@amount DECIMAL(9,2) 
 ,@startDate DATE
-,@endDate DATE
+,@endDate VARCHAR(40)
 AS
 BEGIN
 BEGIN TRY

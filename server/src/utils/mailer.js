@@ -71,7 +71,7 @@ const paymentSuccessMailOptions =(sendTo,subject)=>{
         subject, 
         template: "paymentsuccess", 
         context:{
-            address: `${process.env.ADDRESS}`,   
+            // address: `${process.env.ADDRESS}`,   
         }
     }
 }

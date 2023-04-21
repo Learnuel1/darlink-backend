@@ -50,15 +50,15 @@ exports.upgradeCompletion = async(details)=>{
       let data, endDate="";
       const req = new sql.Request();
       if(details.endDate) endDate=details.endDate;
-        req.input("userPlanId",sql.VarChar,details.userPlanId)
-        req.input("planId",sql.VarChar,details.planId)
-        req.input("refId",sql.VarChar,details.refId)
-        req.input("userId",sql.VarChar,details.userId.trim())
-        req.input("plan",sql.VarChar,details.plan.trim())
-        req.input("amount",sql.Decimal,details.amount.trim())
-        req.input("duration",sql.VarChar,details.duration.trim())
-        req.input("startDate",sql.data,details.startDate)
-        req.input("endDate",sql.data, startDate)
+        req.input("userPlanId",sql.VarChar(255),details.userPlanId)
+        req.input("planId",sql.VarChar(255),details.planId)
+        req.input("refId",sql.VarChar(255),details.refId)
+        req.input("userId",sql.VarChar(255),details.userId)
+        req.input("plan",sql.VarChar(60),details.plan);
+        req.input("amount",sql.Decimal,details.amount)
+        req.input("duration",sql.VarChar(255),details.duration.trim())
+        req.input("startDate",sql.Date,details.startDate)
+        req.input("endDate",sql.Date, startDate)
         await req.execute(DB_ACTIONS.SP_UPGRADE_USER_PLAN).then(result=>{
             if(result.rowsAffected>0)
             data= result.rowsAffected[0];

@@ -420,7 +420,8 @@ AS
 BEGIN
 BEGIN TRY
 BEGIN TRAN
-   
+   IF @endDate = ' '
+    SET @endDate =NULL
 UPDATE tbluserplan SET [planId]=@planId, [plan]=@plan, amount =@amount, startDate=@startDate, endDate=@endDate, updatedAt=GETDATE()
 WHERE userPlanId=@userPlanId AND userId =@userId;  
 DELETE FROM tbltemp_reference WHERE id=@refId

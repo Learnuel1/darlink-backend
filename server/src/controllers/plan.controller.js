@@ -2,6 +2,7 @@ const { getPaystackSecreteKey } = require("../config/env");
 const logger = require("../logger");
 const { getPlanById, generateTempRef, getTempReference, getUserPlan, finalizePlanUpgrade } = require("../services");
 const { APIError } = require("../utils/apiError");
+const { paymentSuccessMailHandler } = require("../utils/mailer");
 const {options} = require("../utils/paystack.auth");
 
 
@@ -69,15 +70,12 @@ exports.paymentCompleted = async (req, res, next) => {
           temPlan = temPlan[0];
           let userPlan = await getUserPlan(temPlan.userId);
           let plan = await   getPlanById(temPlan.planId);
-          console.log(userPlan,"user plan")
-          console.log(plan, "plan")
           if(!userPlan || userPlan.length === 0 || userPlan.error) {
             logger.error("Paid plan update failed", {meta:"paystack-plan-service"});
           }
           else if(!plan || plan.length === 0 || plan.error) {
             logger.error("Paid plan update failed", {meta:"paystack-plan-service"});
           }
-           
           // update user plan info
           const startDate = new Date();
           plan = plan[0];
@@ -91,14 +89,17 @@ exports.paymentCompleted = async (req, res, next) => {
             startDate,
           }
           const finalize = await finalizePlanUpgrade(upgradePlanInfor);
-          console.log(finalize, "finalize plan")
           if(!finalize || finalize.error){
             APIError.customError("Plan final upgrade failed",400);
             logger.info("Plan final upgrade failed", {meta:"paystack-plan-service"});
           }else{
-            //send email to customer
             logger.info("Plan upgraded successfully", {meta: "Plan-service"});
-          }
+            //send email to customer 
+            const emailer = await paymentSuccessMailHandler(event.customer.email);
+            if (emailer.error)
+                APIError.customError("Upgrade payment mail failed to send", 400)
+                else logger.info("Upgrade payment success mail sent", {meta:"email-service"});
+              }
         }
       }
     }else{

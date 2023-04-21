@@ -60,7 +60,6 @@ exports.upgradeCompletion = async(details)=>{
         req.input("endDate",sql.VarChar(40), endDate)
         await req.execute(DB_ACTIONS.SP_UPGRADE_USER_PLAN).then(result=>{
             if(result.rowsAffected >0 || result.rowsAffected.length > 0)
-            console.log(result);
             data= result.rowsAffected[0];
         }).catch(err=>{
             data={error:err};

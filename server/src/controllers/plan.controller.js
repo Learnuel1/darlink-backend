@@ -90,8 +90,10 @@ exports.paymentCompleted = async (req, res, next) => {
             startDate: Date.now(),
           }
           const finalize = await finalizePlanUpgrade(upgradePlanInfor);
+          console.log(finalize, "finalize plan")
           if(!finalize || finalize.error){
-            logger.error("Plan final upgrade failed", {meta:"paystack-plan-service"});
+            APIError.customError("Plan final upgrade failed",400);
+            logger.infor("Plan final upgrade failed", {meta:"paystack-plan-service"});
           }else{
             //send email to customer
             logger.info("Plan upgraded successfully", {meta: "Plan-service"});

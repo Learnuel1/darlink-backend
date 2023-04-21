@@ -45,14 +45,11 @@ exports.findTempReference = async(reference) =>{
 
 }
 
-exports.upGradeCompletion = async(details)=>{
-  try { 
-      let data;
+exports.upgradeCompletion = async(details)=>{
+  try {  
+      let data, endDate="";
       const req = new sql.Request();
-      req.input("planId",sql.VarChar,exports.plan=async(details)=>{
-        let data, endDate="";
-        if(details.endDate) endDate=details.endDate;
-        const req = new sql.Request();
+      if(details.endDate) endDate=details.endDate;
         req.input("userPlanId",sql.VarChar,details.userPlanId)
         req.input("planId",sql.VarChar,details.planId)
         req.input("refId",sql.VarChar,details.refId)
@@ -68,7 +65,6 @@ exports.upGradeCompletion = async(details)=>{
         }).catch(err=>{
             data={error:err};
         })
-      })
         return data;            
     } catch (error) {
         return{error};

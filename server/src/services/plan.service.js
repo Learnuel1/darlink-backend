@@ -47,6 +47,7 @@ exports.findTempReference = async(reference) =>{
 
 exports.upgradeCompletion = async(details)=>{
   try {  
+    console.log(details,"details")
       let data, endDate="";
       const req = new sql.Request();
       if(details.endDate) endDate=details.endDate;
@@ -56,9 +57,8 @@ exports.upgradeCompletion = async(details)=>{
         req.input("userId",sql.VarChar(255),details.userId)
         req.input("plan",sql.VarChar(60),details.plan);
         req.input("amount",sql.Decimal,details.amount)
-        req.input("duration",sql.VarChar(255),details.duration.trim())
         req.input("startDate",sql.Date,details.startDate)
-        req.input("endDate",sql.Date, startDate)
+        req.input("endDate",sql.Date, endDate)
         await req.execute(DB_ACTIONS.SP_UPGRADE_USER_PLAN).then(result=>{
             if(result.rowsAffected>0)
             data= result.rowsAffected[0];

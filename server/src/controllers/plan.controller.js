@@ -95,7 +95,7 @@ exports.paymentCompleted = async (req, res, next) => {
           }else{
             logger.info("Plan upgraded successfully", {meta: "Plan-service"});
             //send email to customer 
-            const emailer = await paymentSuccessMailHandler(req.email);
+            const emailer = await paymentSuccessMailHandler(event.customer.email);
             if (emailer.error)
                 APIError.customError("Upgrade payment mail failed to send", 400)
                 else logger.info("Upgrade payment success mail sent", {meta:"email-service"});

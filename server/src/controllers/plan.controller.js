@@ -79,6 +79,7 @@ exports.paymentCompleted = async (req, res, next) => {
           }
            
           // update user plan info
+          const startDate = new Date();
           plan = plan[0];
           const upgradePlanInfor = {
             planId: plan.planId,
@@ -87,7 +88,7 @@ exports.paymentCompleted = async (req, res, next) => {
             amount: plan.amount,
             refId:temPlan.id,
             userPlanId: userPlan.userPlanId,
-            startDate: Date.now(),
+            startDate,
           }
           const finalize = await finalizePlanUpgrade(upgradePlanInfor);
           console.log(finalize, "finalize plan")

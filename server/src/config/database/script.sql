@@ -413,8 +413,7 @@ CREATE PROCEDURE sp_upgrade_user_plan
 ,@userId VARCHAR(255)
 ,@refId VARCHAR(255)
 ,@plan VARCHAR(60)
-,@amount DECIMAL(9,2)
-,@duration VARCHAR(10)
+,@amount DECIMAL(9,2) 
 ,@startDate DATE
 ,@endDate DATE
 AS

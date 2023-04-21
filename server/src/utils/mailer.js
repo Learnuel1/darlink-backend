@@ -64,14 +64,34 @@ const verificationdMailOptions =(sendTo,subject,expiryTime,uniqueString,username
         }
     }
 }
+const paymentSuccessMailOptions =(sendTo,subject)=>{
+    return{
+        from:`${CONFIG.APP_NAME} ${domainMail.mail()}`,
+        to:sendTo,
+        subject, 
+        template: "paymentsuccess", 
+        context:{
+            address: `${process.env.ADDRESS}`,   
+        }
+    }
+}
  
+exports.paymentSuccessMailHandler=async(email)=>{
+        return new Promise((resolve, reject) => {
+            const mail = paymentSuccessMailOptions(email, "Plan Upgrade")
+            transporter.sendMail(mail, (err, data) => {
+                if (err) {
+                    return reject(err);
+                }
+                return resolve({ success: true })
+            });
+        }) 
+}
 exports.recoveryPasswordMailHandler=async(email,expiryTime,uniqueString)=>{
-   
         return new Promise((resolve, reject) => {
             const mail = passwordMailOptions(email, "Password Reset", expiryTime, uniqueString)
             transporter.sendMail(mail, (err, data) => {
                 if (err) {
-                    console.log(err)
                     return reject(err);
                 }
                 return resolve({ success: true })

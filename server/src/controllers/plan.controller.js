@@ -56,13 +56,13 @@ exports.paymentCompleted = async (req, res, next) => {
       // Retrieve the request's body
        logger.info("Payment authorization confirmed", {meta:"Paystack-service"});
       const event = req.body.data;
-      logger.info(event);
+       
       // check response status
       if(event.status === "success"){
         // send info to database
         let temPlan = await getTempReference(event.reference);
-       console.log(temPlan)
-        if(!temPlan || temPlan.error){
+      
+        if(!temPlan.error || temPlan.length ===0){
           APIError.customError("Temporal reference failed",400);
           logger.info("Temporal reference retrieval failed", {meta:"paystack-plan-service"});
         }else{
@@ -70,13 +70,15 @@ exports.paymentCompleted = async (req, res, next) => {
           temPlan = temPlan[0];
           let userPlan = await getUserPlan(temPlan.userId);
           let plan = await   getPlanById(temPlan.planId);
-          if(!userPlan || userPlan.error) {
+          console.log(userPlan)
+          console.log(plan)
+          if(!userPlan.length === 0 || userPlan.error) {
             logger.error("Paid plan update failed", {meta:"paystack-plan-service"});
           }
           else if(!plan || plan.error) {
-            userPlan =userPlan[0];
             logger.error("Paid plan update failed", {meta:"paystack-plan-service"});
           }
+          userPlan =userPlan[0];
           // update user plan info
           plan = plan[0];
           const upgradePlanInfor = {

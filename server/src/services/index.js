@@ -47,4 +47,4 @@ exports.verifyUserProfile =async (username) => UserModule.verifyProfile(username
 exports.upgradePlan = async (infor) => PlanModule.planPayment(infor);
 exports.generateTempRef = async(id, planId,userId) => PlanModule.tempReference(id, planId,userId);
 exports.getTempReference = async(reference) => PlanModule.findTempReference(reference);
-exports.finalizePlanUpgrade = async(details) => PlanModule.upGradeCompletion(details);
+exports.finalizePlanUpgrade = async(details) => PlanModule.upgradeCompletion(details);

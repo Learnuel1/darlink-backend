@@ -69,15 +69,15 @@ exports.paymentCompleted = async (req, res, next) => {
           temPlan = temPlan[0];
           let userPlan = await getUserPlan(temPlan.userId);
           let plan = await   getPlanById(temPlan.planId);
-          console.log(userPlan)
-          console.log(plan)
+          console.log(userPlan,"user plan")
+          console.log(plan, "plan")
           if(!userPlan || userPlan.length === 0 || userPlan.error) {
             logger.error("Paid plan update failed", {meta:"paystack-plan-service"});
           }
           else if(!plan || plan.length === 0 || plan.error) {
             logger.error("Paid plan update failed", {meta:"paystack-plan-service"});
           }
-          userPlan =userPlan[0];
+           
           // update user plan info
           plan = plan[0];
           const upgradePlanInfor = {

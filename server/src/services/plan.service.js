@@ -58,7 +58,7 @@ exports.upgradeCompletion = async(details)=>{
         req.input("plan",sql.VarChar(60),details.plan);
         req.input("amount",sql.Decimal,details.amount)
         req.input("startDate",sql.Date,details.startDate)
-        req.input("endDate",sql.Date, endDate)
+        req.input("endDate",sql.VarChar(40), endDate)
         await req.execute(DB_ACTIONS.SP_UPGRADE_USER_PLAN).then(result=>{
             if(result.rowsAffected>0)
             data= result.rowsAffected[0];

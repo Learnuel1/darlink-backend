@@ -97,8 +97,8 @@ exports.paymentCompleted = async (req, res, next) => {
             //send email to customer 
             const emailer = await paymentSuccessMailHandler(req.email);
             if (emailer.error)
-                APIError.customError("Recovery mail failed to send", 400)
-                else logger.info("Upgrade success mail sent", {meta:"email-service"});
+                APIError.customError("Upgrade payment mail failed to send", 400)
+                else logger.info("Upgrade payment success mail sent", {meta:"email-service"});
               }
         }
       }

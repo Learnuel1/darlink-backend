@@ -62,7 +62,7 @@ exports.paymentCompleted = async (req, res, next) => {
       const event = req.body.data;
       // check response status
       if(event.status === "success"){
-        // send info to database
+        // send info to databaseq
         let temPlan = await getTempReference(event.reference);
         if(!temPlan || temPlan.length ===0 || temPlan.error){
           APIError.customError("Temporal reference failed",400);

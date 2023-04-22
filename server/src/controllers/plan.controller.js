@@ -16,6 +16,9 @@ exports.ctrlPlanUpgrade = async ( req, res, next) => {
     if(plan.error) return next(APIError.customError(plan.error, 400));
     const https = require('https')
     const selectPlan = plan[0]
+    // get user plan
+    const userPlan = await getUserPlan(req.userId);
+    if (userPlan.planId === planId) return next(APIError.badRequest("You can't upgrade to your current plan"));
     const params = JSON.stringify({
       "email": req.email,
       "amount": selectPlan.amount*100,
@@ -57,7 +60,6 @@ exports.paymentCompleted = async (req, res, next) => {
       // Retrieve the request's body
        logger.info("Payment authorization confirmed", {meta:"Paystack-service"});
       const event = req.body.data;
-       
       // check response status
       if(event.status === "success"){
         // send info to database

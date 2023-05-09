@@ -1,4 +1,4 @@
-const { getPaystackSecreteKey } = require("../config/env");
+const { getPaystackSecreteKey, getPaystackCallBackUrl } = require("../config/env");
 const logger = require("../logger");
 const { getPlanById, generateTempRef, getTempReference, getUserPlan, finalizePlanUpgrade } = require("../services");
 const { APIError } = require("../utils/apiError");
@@ -18,10 +18,12 @@ exports.ctrlPlanUpgrade = async ( req, res, next) => {
     const selectPlan = plan[0]
     // get user plan
     const userPlan = await getUserPlan(req.userId);
+    const callback_url = getPaystackCallBackUrl();
     if (userPlan.planId === planId) return next(APIError.badRequest("You can't upgrade to your current plan"));
     const params = JSON.stringify({
       "email": req.email,
       "amount": selectPlan.amount*100,
+      "callback_url":callback_url,
     }) 
     const reqpay = https.request(options, reqpay => {
       let data = ''

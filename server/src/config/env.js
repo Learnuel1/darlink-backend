@@ -11,4 +11,5 @@ module.exports ={
     getRefreshTokenSecrete:()=>process.env.REFRESH_TOKEN_SECRETE,
     getTokenSecrete:()=>process.env.TOKEN_TOKEN_SECRETE,
     getPaystackSecreteKey:()=> process.env.PAYSTACK_SECRET_KEY,
+    getPaystackCallBackUrl: () => process.env.PAYSTACK_CALL_BACK_URL,
 }

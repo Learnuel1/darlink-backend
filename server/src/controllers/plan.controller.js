@@ -1,10 +1,11 @@
 const { getPaystackSecreteKey, getPaystackCallBackUrl } = require("../config/env");
 const logger = require("../logger");
-const { getPlanById, generateTempRef, getTempReference, getUserPlan, finalizePlanUpgrade, fundWallet, getWalletTempReference } = require("../services");
+const { getPlanById, generateTempRef, getTempReference, getUserPlan, finalizePlanUpgrade, fundWallet, getWalletTempReference, getWalletBalance } = require("../services");
 const { ACTIONS } = require("../utils/actions");
 const { APIError } = require("../utils/apiError");
 const { paymentSuccessMailHandler } = require("../utils/mailer");
 const {options} = require("../utils/paystack.auth");
+const https = require('https')
 
 
 exports.ctrlPlanUpgrade = async ( req, res, next) => {
@@ -15,8 +16,11 @@ exports.ctrlPlanUpgrade = async ( req, res, next) => {
     const plan = await getPlanById(planId);
     if(!plan || plan.length === 0) return next(APIError.customError("Plan NOT found", 404));
     if(plan.error) return next(APIError.customError(plan.error, 400));
-    const https = require('https')
     const selectPlan = plan[0]
+    const wallet = await getWalletBalance(req.userId)
+    if(!wallet || wallet.length === 0) return next(APIError.customError("Wallet NOT found", 404));
+    if(wallet.error) return next(APIError.customError(wallet.error, 400));
+    if(selectPlan.amount >= wallet.balance) return next(APIError.badRequest("Insufficient Fund", 400));
     // get user plan
     const userPlan = await getUserPlan(req.userId);
     const callback_url = getPaystackCallBackUrl();
@@ -106,13 +110,12 @@ exports.paymentCompleted = async (req, res, next) => {
               logger.info("Plan upgraded successfully", {meta: "Plan-service"});
               //send email to customer 
               const emailer = await paymentSuccessMailHandler(event.customer.email);
-              if (emailer.error)
-                  APIError.customError("Upgrade payment mail failed to send", 400)
+              if (emailer.error) APIError.customError("Upgrade payment mail failed to send", 400)
                   else logger.info("Upgrade payment success mail sent", {meta:"email-service"});
                 }
           }else if(temPlan.type === ACTIONS.TRANSACTION_TYPE[1]){
             // fund wallet
-            const wallet = await fundWallet(req.userId, event.data.amount);
+            const wallet = await fundWallet(req.userId, event.amount);
             if(!wallet || wallet.error){
               APIError.customError("Wallet funding failed",400);
               logger.info("Wallet funding failed", {meta:"paystack-wallet-service"});

@@ -126,13 +126,21 @@ CREATE TABLE tblappearance(
 GO
 CREATE TABLE tbltemp_reference (
      id varchar(255) NOT NULL
-     ,planId VARCHAR(255)  NULL
+     ,planId VARCHAR(255) NOT NULL
      ,userId VARCHAR(255) NOT NULL
      ,[type] VARCHAR(255) NOT NULL CHECK([type] IN ('plan','wallet'))
      ,createdAt DATETIME NOT NULL DEFAULT GETDATE()
     ,CONSTRAINT PK_temp_reference PRIMARY KEY(id)
     ,CONSTRAINT FK_temp_referencePlan FOREIGN KEY(planId) REFERENCES tblplan(planId) ON DELETE CASCADE
     ,CONSTRAINT FK_temp_referenceUser FOREIGN KEY(userId) REFERENCES tblusers(UserId) ON DELETE CASCADE
+)
+CREATE TABLE tblwallet_reference (
+     id varchar(255) NOT NULL 
+     ,userId VARCHAR(255) NOT NULL
+     ,[type] VARCHAR(255) NOT NULL CHECK([type] IN ('plan','wallet'))
+     ,createdAt DATETIME NOT NULL DEFAULT GETDATE()
+    ,CONSTRAINT PK_wallet_reference PRIMARY KEY(id) 
+    ,CONSTRAINT FK_wallet_walletUser FOREIGN KEY(userId) REFERENCES tblusers(UserId) ON DELETE CASCADE
 )
 GO
 CREATE TABLE tblwallet(

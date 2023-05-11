@@ -16,4 +16,5 @@ SP_VERIFY_PROFILE: "sp_verify_user_preview",
 SP_TEMP_REFERENCE: "sp_temp_reference",
 SP_UPGRADE_USER_PLAN: "sp_upgrade_user_plan",
 SP_FUND_WALLET: "sp_fund_wallet",
+SP_WALLET_REFERENCE: "sp_wallet_reference",
 }

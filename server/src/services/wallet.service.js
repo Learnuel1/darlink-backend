@@ -1,4 +1,3 @@
-const cuid = require("cuid");
 const { sql } = require("../config/database");
 const { DB_ACTIONS } = require("../config/database/action");
 
@@ -54,3 +53,38 @@ exports.fund = async(userId, amount)=>{
       return { error: error };
     }
   };
+
+  exports.tempReference = async (id,userId, tranType) => {
+  
+    let exist;
+     
+    const request = new sql.Request();
+    request.input("id", sql.VarChar(255), id); 
+    request.input("userId", sql.VarChar(255), userId);
+    request.input("tranType", sql.VarChar(10), tranType);
+    await request
+      .execute(DB_ACTIONS.SP_WALLET_REFERENCE)
+      .then((result) => {
+        if (result.rowsAffected.length > 0) exist = true;
+        else exist = false;
+      });
+    return exist;
+  };
+  
+  exports.findTempReference = async(reference) =>{
+    try {
+      let data;
+      const request = new sql.Request();
+      request.input("id", sql.VarChar(255), reference);
+    await  request.query(`SELECT * FROM tblwallet_reference WHERE id =@id`).then(result => {
+        if(result.recordset.length >0)
+        data = result.recordset;
+      }).catch( err => {
+        data = { error : err};
+      })
+      return data;
+    } catch (error) {
+      return { error }
+    }
+  
+  }

@@ -17,7 +17,7 @@ CREATE PROCEDURE sp_register
   RAISERROR('Registration is not available at the moment',16,1)
  INSERT INTO tblusers(userId,username,password,email,role)
  VALUES(@id,@username,@password,@email,@role)
- 
+ INSERT INTO tblwallet(userId) VALUES(@id)
  INSERT INTO tbluserplan(userPlanId,planId,userId) VALUES(@userplanid,@defaultPlanId,@id)
  COMMIT TRAN
  
@@ -391,11 +391,12 @@ CREATE PROCEDURE sp_temp_reference
 @id VARCHAR(255)
 ,@planId VARCHAR(255)
 ,@userId VARCHAR(255)
+,@tranType VARCHAR(10)
 AS
 BEGIN
 BEGIN TRY
 BEGIN TRAN
-INSERT INTO tbltemp_reference(id, planId,userId) VALUES(@id, @planId,@userId)
+INSERT INTO tbltemp_reference(id, planId,userId,[type]) VALUES(@id, @planId,@userId,@tranType)
 COMMIT TRAN
 END TRY
 BEGIN CATCH
@@ -406,6 +407,7 @@ RAISERROR(@em,16,1)
 END CATCH
 END
 GO
+
 
 CREATE PROCEDURE sp_upgrade_user_plan
 @userPlanId VARCHAR(255)
@@ -434,4 +436,33 @@ SET @em = ERROR_MESSAGE()
 RAISERROR(@em,16,1)
 END CATCH
 END 
+GO
+
+CREATE PROCEDURE sp_fund_wallet
+@userId VARCHAR(255)
+,@amount DECIMAL (9,2)
+AS
+BEGIN
+BEGIN TRY
+BEGIN TRAN
+DECLARE @exist VARCHAR(255)
+SET @exist = (SELECT id FROM tblwallet WHERE userId =@userId);
+IF @exist = ' ' OR @exist = NULL
+  BEGIN
+  INSERT INTO tblwallet(userId,balance) VALUES(@userId,@amount)
+  END
+ELSE
+  BEGIN
+    UPDATE tblwallet SET balance= (balance + @amount), updatedAt = GETDATE() 
+    WHERE  userId = @userId
+  END
+COMMIT TRAN
+END TRY
+BEGIN CATCH
+ROLLBACK TRAN
+DECLARE @em VARCHAR(150)
+SET @em = ERROR_MESSAGE()
+RAISERROR(@em,16,1)
+END CATCH
+END
 GO

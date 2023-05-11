@@ -13,6 +13,7 @@ exports.ACTIONS ={
     EMAIL: "email",
     COMPLETED: {success:true, msg:'Operation Successful'},
     RESET_PASSWORD: "Password Recovery",
+    TRANSACTION_TYPE: ['plan', 'wallet'],
 }
 
 exports.PLANS={

@@ -1,6 +1,6 @@
 const UserModule = require('./user.service');
 const PlanModule = require("./plan.service");
-
+const WalletModule = require("./wallet.service");
 exports.registerUser = async (username, password, email, plan, role = 'user') => {
     return await UserModule.register(username, password, email, plan, role);
 }
@@ -45,6 +45,11 @@ exports.verifyUserProfile =async (username) => UserModule.verifyProfile(username
 
 // plan section
 exports.upgradePlan = async (infor) => PlanModule.planPayment(infor);
-exports.generateTempRef = async(id, planId,userId) => PlanModule.tempReference(id, planId,userId);
+exports.generateTempRef = async(id, planId,userId, tranType) => PlanModule.tempReference(id, planId,userId, tranType);
 exports.getTempReference = async(reference) => PlanModule.findTempReference(reference);
 exports.finalizePlanUpgrade = async(details) => PlanModule.upgradeCompletion(details);
+
+// Wallet Secion
+exports.getWalletBalance = async (userId) => WalletModule.balance(userId);
+exports.createWallet = async (infor) => WalletModule.create(infor);
+exports.fundWallet = async (userId, amount) => WalletModule.fund(userId, amount);

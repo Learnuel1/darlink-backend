@@ -4,11 +4,14 @@ const { options, verifyOtions } = require('../utils/paystack.auth');
 const { APIError } = require('../utils/apiError');
 const logger = require('../logger');
 const responseBuilder = require("../utils/responsBuilder");
-const { getWalletBalance } = require('../services');
+const { getWalletBalance,  generateWalletTempRef } = require('../services');
+const { ACTIONS } = require('../utils/actions');
+
 exports.ctrlInitiateTransaction = async ( req, res, next) => {
   try{ 
       const {amount } = req.body;
       if(!amount) return next(APIError.badRequest("Amount is required"));
+      if(amount <= 0) return next(APIError.badRequest("Invalid amount"));
     const callback_url = getPaystackWalletCallBackUrl(); 
     const params = JSON.stringify({
       "email": req.email,
@@ -23,8 +26,13 @@ exports.ctrlInitiateTransaction = async ( req, res, next) => {
       reqpay.on('end', () => {
         // write info to database
         data = JSON.parse(data); 
+        const transType = ACTIONS.TRANSACTION_TYPE[1];
+        generateWalletTempRef(data.data.reference, req.userId, transType).then((check) =>{
           logger.info("Payment authorized successfully", {meta:"Paystack-service"});
-          res.send(data);  
+          res.send(data);
+        }).catch((err) =>{
+          return res.status(400).json({error:"Authorization failed, try again"})
+        })  
       })
     }).on('error', error => {
       next(error);

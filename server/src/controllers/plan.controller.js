@@ -1,6 +1,6 @@
 const { getPaystackSecreteKey, getPaystackCallBackUrl } = require("../config/env");
 const logger = require("../logger");
-const { getPlanById, generateTempRef, getTempReference, getUserPlan, finalizePlanUpgrade, fundWallet } = require("../services");
+const { getPlanById, generateTempRef, getTempReference, getUserPlan, finalizePlanUpgrade, fundWallet, getWalletTempReference } = require("../services");
 const { ACTIONS } = require("../utils/actions");
 const { APIError } = require("../utils/apiError");
 const { paymentSuccessMailHandler } = require("../utils/mailer");
@@ -51,46 +51,7 @@ exports.ctrlPlanUpgrade = async ( req, res, next) => {
   }catch(error){
     next(error);
   }
-}
-exports.ctrlFundWallet = async ( req, res, next) => {
-  try{ 
-    const { amount } = req.body;
-    if (!amount) return next(APIError.badRequest("Amount is required")); 
-    const https = require('https')
-    // get user plan
-    const callback_url = getPaystackCallBackUrl();
-    const params = JSON.stringify({
-      "email": req.email,
-      "amount": amount*100,
-      "callback_url":callback_url,
-    }) 
-    const reqpay = https.request(options, reqpay => {
-      let data = ''
-      reqpay.on('data', (chunk) => {
-        data += chunk
-      });
-      reqpay.on('end', () => {
-        // write info to database
-        data = JSON.parse(data);
-        const transType = ACTIONS.TRANSACTION_TYPE[1];
-        generateTempRef(data.data.reference, planId,req.userId, transType).then((check) =>{
-          logger.info("Payment authorized successfully", {meta:"Paystack-service"});
-          res.send(data);
-        }).catch((err) =>{
-          return res.status(400).json({error:"Authorization failed, try again"})
-        })
-      })
-    }).on('error', error => {
-      next(error);
-    })
-    
-    reqpay.write(params)
-    reqpay.end()
-  }catch(error){
-    next(error);
-  }
-}
-
+} 
 exports.paymentCompleted = async (req, res, next) => {
   try{
     const crypto = require('crypto');
@@ -106,14 +67,17 @@ exports.paymentCompleted = async (req, res, next) => {
       if(event.status === "success"){
         // send info to databaseq
         let temPlan = await getTempReference(event.reference);
+        if(!temPlan || temPlan.length ===0){
+          temPlan = await getWalletTempReference(event.reference);
+        }
         if(!temPlan || temPlan.length ===0 || temPlan.error){
           APIError.customError("Temporal reference failed",400);
           logger.info("Temporal reference retrieval failed", {meta:"paystack-plan-service"});
         }else{
           logger.info("Temporal reference id retrieved", {meta:"paystack-plan-service"});
           temPlan = temPlan[0];
-          let userPlan = await getUserPlan(temPlan.userId);
           if(temPlan.type === ACTIONS.TRANSACTION_TYPE[0]){
+            let userPlan = await getUserPlan(temPlan.userId);
 
             let plan = await   getPlanById(temPlan.planId);
             if(!userPlan || userPlan.length === 0 || userPlan.error) {
@@ -151,11 +115,11 @@ exports.paymentCompleted = async (req, res, next) => {
             const wallet = await fundWallet(req.userId, event.data.amount);
             if(!wallet || wallet.error){
               APIError.customError("Wallet funding failed",400);
-              logger.info("Wallet fundingfailed", {meta:"paystack-wallet-service"});
+              logger.info("Wallet funding failed", {meta:"paystack-wallet-service"});
             }else{
               logger.info("Wallet funded successfully", {meta: "Wallet-service"});
             }
-          }
+          } else logger.info("invalid transaction type", {meta: "paystack-service"});
         }
       }
     }else{

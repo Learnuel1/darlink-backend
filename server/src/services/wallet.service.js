@@ -1,12 +1,12 @@
 const { sql } = require("../config/database");
 const { DB_ACTIONS } = require("../config/database/action");
 
-exports.create = async(details)=>{
+exports.create = async(userId, amount)=>{
   try {  
       let data;
       const req = new sql.Request(); 
-        req.input("userId",sql.VarChar(255),details.userId)
-        req.input("amount",sql.Decimal,details.amount)
+        req.input("userId",sql.VarChar(255),userId)
+        req.input("amount",sql.Decimal,amount)
         await req.execute(DB_ACTIONS.SP_FUND_WALLET).then(result=>{
             if(result.rowsAffected >0 || result.rowsAffected.length > 0)
             data= result.rowsAffected[0];

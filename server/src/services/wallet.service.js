@@ -18,10 +18,11 @@ exports.create = async(userId, amount)=>{
         return{error};
     }  
   } 
-exports.fund = async(userId, amount)=>{
+exports.fund = async(userId, amount, reference)=>{
   try {  
       let data;
       const req = new sql.Request(); 
+        req.input("id",sql.VarChar(255),reference)
         req.input("userId",sql.VarChar(255),userId)
         req.input("amount",sql.Decimal,amount)
         await req.execute(DB_ACTIONS.SP_FUND_WALLET).then(result=>{

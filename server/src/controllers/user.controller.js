@@ -29,7 +29,8 @@ const { registerUser,
     deleteAccount,
     updateUserButton,
     updateUserProfile,
-    getPlanById} = require("../services");
+    getPlanById,
+    createWallet} = require("../services");
 const { APIError } = require("../utils/apiError");
 const { isValidEmail } = require("../utils/validation");
 const responseBuilder = require('../utils/responsBuilder');
@@ -53,7 +54,7 @@ exports.ctrRegister =async(req,res,next)=>{
         const hashedPass = hashSync(password.trim(),12);
         const register = await registerUser(username.trim(),hashedPass,email.trim(),ACTIONS.DEFAULT_PLAN);
         if(!register)
-        return next(APIError.customError())
+        return next(APIError.customError("Registration failed, try again", 400))
         if(register.error)
         return next(APIError.customError(register.error,400));
         res.status(200).json(register);
@@ -465,19 +466,7 @@ exports.ctrlButton = async (req, res, next) => {
              if(!isValidEmail(details.email))
       return  next(APIError.badRequest(ERROR_FIELD.INVALID_EMAIL));
         }
-        // if(check === ACTIONS.SOCIAL || 
-        // check === ACTIONS.MUSIC || 
-        // check === ACTIONS.PODCAST || 
-        // check === ACTIONS.CONTACT ||
-        // check === ACTIONS.PHONE ||
-        // check === ACTIONS.DISCORD ||
-        // check === ACTIONS.TELEGRAM)
-        // if(
-        // plan !== PLANS.PERSONAL ||
-        //  plan !== PLANS.ENTREPRENEUR){
-        //     infor =  PLANS.PERSONAL.charAt(0).toUpperCase() + PLANS.PERSONAL.slice(1);
-        //     return next(APIError.unauthenticated(`Upgrade plan to ${infor} Plan`))
-        // }
+         
         details.plan=plan;
 
     const button = await userButton(details);
@@ -512,21 +501,7 @@ exports.ctrlUpdateButton = async (req, res, next) => {
         if(details.email){
              if(!isValidEmail(details.email))
         next(APIError.badRequest(ERROR_FIELD.INVALID_EMAIL));
-        }
-
-        // if(check === ACTIONS.SOCIAL || 
-        // check === ACTIONS.MUSIC || 
-        // check === ACTIONS.PODCAST || 
-        // check === ACTIONS.CONTACT ||
-        // check === ACTIONS.PHONE ||
-        // check === ACTIONS.DISCORD ||
-        // check === ACTIONS.TELEGRAM)
-        // if(
-        // plan !== PLANS.PERSONAL ||
-        //  plan !== PLANS.ENTREPRENEUR){
-        //     infor =  PLANS.PERSONAL.charAt(0).toUpperCase() + PLANS.PERSONAL.slice(1);
-        //     return next(APIError.unauthenticated(`Upgrade plan to ${infor} Plan`))
-        // } 
+        } 
     const button = await updateUserButton(details);
     if(!button)
     return next(APIError.customError(ERROR_FIELD.NOT_FOUND,404))

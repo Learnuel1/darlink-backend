@@ -3,13 +3,14 @@ const cuid = require("cuid");
 const { DB_ACTIONS } = require("../config/database/action");
 
 
- exports.tempReference = async (id, planId,userId) => {
+ exports.tempReference = async (id, planId,userId, tranType) => {
   
   let exist;
   const request = new sql.Request();
   request.input("id", sql.VarChar(255), id);
   request.input("planId", sql.VarChar(255), planId);
   request.input("userId", sql.VarChar(255), userId);
+  request.input("tranType", sql.VarChar(10), tranType);
   await request
     .execute(DB_ACTIONS.SP_TEMP_REFERENCE)
     .then((result) => {

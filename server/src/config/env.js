@@ -12,4 +12,5 @@ module.exports ={
     getTokenSecrete:()=>process.env.TOKEN_TOKEN_SECRETE,
     getPaystackSecreteKey:()=> process.env.PAYSTACK_SECRET_KEY,
     getPaystackCallBackUrl: () => process.env.PAYSTACK_CALL_BACK_URL,
+    getPaystackWalletCallBackUrl: () => process.env.PAYSTACK__WALLET_CALL_BACK_URL,
 }

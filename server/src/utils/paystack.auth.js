@@ -11,7 +11,21 @@ const options = {
     'Content-Type': 'application/json'
   }
 }
+const verifyOtions = (reference) => {
+ return {
+  hostname: 'api.paystack.co',
+  port: 443,
+  path: `/transaction/verify/:reference`,
+  params:{reference},
+  method: 'GET',
+  headers: {
+    Authorization: `Bearer ${auth}`,
+    'Content-Type': 'application/json'
+  }}
+}
  
 
-module.exports = {options
+module.exports = {
+  options,
+  verifyOtions,
 };

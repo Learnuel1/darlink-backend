@@ -55,3 +55,4 @@ exports.createWallet = async (infor) => WalletModule.create(infor);
 exports.fundWallet = async (userId, amount, reference) => WalletModule.fund(userId, amount, reference);
 exports.generateWalletTempRef = async(id, userId, tranType) => WalletModule.tempReference(id, userId, tranType);
 exports.getWalletTempReference = async(reference) => WalletModule.findTempReference(reference);
+exports.spendWallet = async (userId, amount, reference) => WalletModule.spend(userId, amount, reference);

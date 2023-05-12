@@ -108,6 +108,7 @@ exports.paymentCompleted = async (req, res, next) => {
               logger.info("Plan final upgrade failed", {meta:"paystack-plan-service"});
             }else{
               logger.info("Plan upgraded successfully", {meta: "Plan-service"});
+              //update wallet 
               //send email to customer 
               const emailer = await paymentSuccessMailHandler(event.customer.email);
               if (emailer.error) APIError.customError("Upgrade payment mail failed to send", 400)

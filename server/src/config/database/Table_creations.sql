@@ -152,3 +152,14 @@ CREATE TABLE tblwallet(
     ,CONSTRAINT PK_wallet PRIMARY KEY (id, userId)
     ,CONSTRAINT FK_wallet_user FOREIGN KEY(userId) REFERENCES tblusers(userId) ON DELETE CASCADE
 )
+CREATE TABLE tblwallet_log(
+    refereceId VARCHAR(255) NOT NULL  
+    ,userId VARCHAR(255) NOT NULL 
+    ,[description] VARCHAR(50) NOT NULL
+    ,amount MONEY NOT NULL
+    ,balance MONEY NOT NULL 
+    ,createAt DATETIME NOT NULL DEFAULT GETDATE()
+    ,updatedAt DATETIME NOT NULL DEFAULT GETDATE()
+    ,CONSTRAINT PK_wallet_log PRIMARY KEY (refereceId, userId)
+    ,CONSTRAINT FK_walletlog_user FOREIGN KEY(userId) REFERENCES tblusers(userId) ON DELETE CASCADE
+)

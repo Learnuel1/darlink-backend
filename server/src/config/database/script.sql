@@ -442,7 +442,7 @@ GO
 CREATE PROCEDURE sp_fund_wallet
 @id varchar(255)
 ,@userId VARCHAR(255)
-,@amount DECIMAL(10,2)
+,@amount MONEY
 AS
 BEGIN
 BEGIN TRY
@@ -485,7 +485,7 @@ GO
 CREATE PROCEDURE sp_spend_wallet
 @id varchar(255)
 ,@userId VARCHAR(255)
-,@amount DECIMAL(10,2)
+,@amount MONEY
 AS
 BEGIN
 BEGIN TRY

@@ -17,7 +17,7 @@ CREATE PROCEDURE sp_register
   RAISERROR('Registration is not available at the moment',16,1)
  INSERT INTO tblusers(userId,username,password,email,role)
  VALUES(@id,@username,@password,@email,@role)
- INSERT INTO tblwallet(userId) VALUES(@id)
+ INSERT INTO tblwallet(userId,balance) VALUES(@id, 0.00)
  INSERT INTO tbluserplan(userPlanId,planId,userId) VALUES(@userplanid,@defaultPlanId,@id)
  COMMIT TRAN
  
@@ -45,6 +45,7 @@ CREATE PROCEDURE sp_default_admin
 
  INSERT INTO tblusers(userId,username,password,email,role)
  VALUES(@id,@username,@password,@email,@role)
+ INSERT INTO tblwallet(userId,balance) VALUES(@id, 0.00)
  COMMIT TRAN
  END TRY
  BEGIN CATCH
@@ -441,27 +442,15 @@ GO
 CREATE PROCEDURE sp_fund_wallet
 @id varchar(255)
 ,@userId VARCHAR(255)
-,@amount DECIMAL (9)
+,@amount DECIMAL(9)
 AS
 BEGIN
 BEGIN TRY
 BEGIN TRAN
-DECLARE @exist VARCHAR(255)
-SET @exist = (SELECT userId FROM tblwallet WHERE userId =@userId);
-IF @exist = ' ' OR @exist = NULL
-  BEGIN
-  INSERT INTO tblwallet(userId,balance) VALUES(@userId,@amount)
-  DELETE FROM tblwallet_reference WHERE id =@id
-  COMMIT TRAN
-  END
-ELSE
-  BEGIN
-    UPDATE tblwallet SET balance = (balance + @amount), updatedAt = GETDATE() 
+    UPDATE tblwallet SET balance = balance + @amount, updatedAt = GETDATE() 
     WHERE  userId = @userId
      DELETE FROM tblwallet_reference WHERE id =@id
     COMMIT TRAN
-  END
-
 END TRY
 BEGIN CATCH
 ROLLBACK TRAN

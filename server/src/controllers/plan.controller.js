@@ -115,7 +115,7 @@ exports.paymentCompleted = async (req, res, next) => {
                 }
           }else if(temPlan.type === ACTIONS.TRANSACTION_TYPE[1]){
             // fund wallet
-            const wallet = await fundWallet(req.userId, (event.amount/100), event.reference);
+            const wallet = await fundWallet(req.userId, (event.amount/100.0), event.reference);
             if(!wallet || wallet.length === 0 ){
               APIError.customError("Wallet funding failed",400);
               logger.info("Wallet funding failed", {meta:"paystack-wallet-service"});

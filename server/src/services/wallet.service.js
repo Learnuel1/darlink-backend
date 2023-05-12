@@ -21,10 +21,11 @@ exports.create = async(userId, amount)=>{
 exports.fund = async(userId, amount, reference)=>{
   try {  
       let data;
+      console.log(amount, "amount")
       const req = new sql.Request(); 
         req.input("id",sql.VarChar(255),reference)
         req.input("userId",sql.VarChar(255),userId)
-        req.input("amount",sql.Decimal, amount.toFixed(2))
+        req.input("amount",sql.Decimal(9,2), amount.toFixed(2))
         await req.execute(DB_ACTIONS.SP_FUND_WALLET).then(result=>{
             if(result.rowsAffected >0 || result.rowsAffected.length > 0)
             data= result.rowsAffected[0];
@@ -56,9 +57,7 @@ exports.fund = async(userId, amount, reference)=>{
   };
 
   exports.tempReference = async (id,userId, tranType) => {
-  
     let exist;
-     
     const request = new sql.Request();
     request.input("id", sql.VarChar(255), id); 
     request.input("userId", sql.VarChar(255), userId);

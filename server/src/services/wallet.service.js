@@ -21,7 +21,6 @@ exports.create = async(userId, amount)=>{
 exports.fund = async(userId, amount, reference)=>{
   try {  
       let data;
-      console.log(userId, amount, reference, "fund infor")
       const req = new sql.Request(); 
         req.input("id",sql.VarChar(255),reference)
         req.input("userId",sql.VarChar(255),userId)

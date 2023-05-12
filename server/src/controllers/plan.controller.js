@@ -115,6 +115,7 @@ exports.paymentCompleted = async (req, res, next) => {
                 }
           }else if(temPlan.type === ACTIONS.TRANSACTION_TYPE[1]){
             // fund wallet
+            console.log(event)
             const wallet = await fundWallet(req.userId, event.amount, event.reference);
             if(!wallet || wallet.length === 0 ){
               APIError.customError("Wallet funding failed",400);
@@ -122,9 +123,8 @@ exports.paymentCompleted = async (req, res, next) => {
             }else if( wallet.error){ 
               APIError.customError(wallet.error,400);
               logger.info("Error occured during Wallet funding", {meta:"paystack-wallet-service"});
-
             }else{
-              logger.info("Wallet funded successfully", {meta: "Wallet-service"});
+              logger.info("Wallet funded successfully", {service: "Wallet-service"});
             }
           } else logger.info("invalid transaction type", {meta: "paystack-service"});
         }

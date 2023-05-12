@@ -482,15 +482,15 @@ END CATCH
 END
 GO
 
-CREATE PROCEDURE sp_fund_wallet
+CREATE PROCEDURE sp_spend_wallet
 @id varchar(255)
 ,@userId VARCHAR(255)
-,@amount DECIMAL(9)
+,@amount DECIMAL(10,2)
 AS
 BEGIN
 BEGIN TRY
 BEGIN TRAN
-    UPDATE tblwallet SET balance = balance + @amount, updatedAt = GETDATE() 
+    UPDATE tblwallet SET balance = balance - @amount, updatedAt = GETDATE() 
     WHERE  userId = @userId
      DELETE FROM tblwallet_reference WHERE id =@id
     COMMIT TRAN

@@ -21,11 +21,14 @@ exports.create = async(userId, amount)=>{
 exports.fund = async(userId, amount, reference)=>{
   try {  
       let data;
+      console.log(userId, amount, reference, "fund infor")
       const req = new sql.Request(); 
         req.input("id",sql.VarChar(255),reference)
         req.input("userId",sql.VarChar(255),userId)
-        req.input("amount",sql.Money,amount)
-        await req.execute(DB_ACTIONS.SP_FUND_WALLET).then(result=>{
+        req.input("amount",sql.Numeric, amount)
+        await req.query(`DELETE FROM tblwallet_reference WHERE id =@id;
+        UPDATE tblwallet SET balance = balance + @amount, updatedAt = GETDATE() 
+        WHERE  userId = @userId`).then(result=>{
           console.log(result)
             if(result.rowsAffected >0 || result.rowsAffected.length > 0)
             data= result.rowsAffected[0];
@@ -43,7 +46,7 @@ exports.spend = async(userId, amount, reference)=>{
       const req = new sql.Request(); 
         req.input("id",sql.VarChar(255),reference)
         req.input("userId",sql.VarChar(255),userId)
-        req.input("amount",sql.Money,amount)
+        req.input("amount",sql.Numeric,amount)
         await req.execute(DB_ACTIONS.SP_SPEND_WALLET).then(result=>{
             if(result.rowsAffected >0 || result.rowsAffected.length > 0)
             data= result.rowsAffected[0];

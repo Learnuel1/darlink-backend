@@ -4,7 +4,7 @@ const { options, verifyOtions } = require('../utils/paystack.auth');
 const { APIError } = require('../utils/apiError');
 const logger = require('../logger');
 const responseBuilder = require("../utils/responsBuilder");
-const { getWalletBalance,  generateWalletTempRef } = require('../services');
+const { getWalletBalance,  generateWalletTempRef, getWalletHistory } = require('../services');
 const { ACTIONS } = require('../utils/actions');
 
 exports.ctrlInitiateTransaction = async ( req, res, next) => {
@@ -77,6 +77,20 @@ exports.ctrlWalletBalance = async (req,res,next)=>{
   return next(APIError.customError(balnace.error,400));
   const data= responseBuilder.buildPlan(balnace);
   const response= responseBuilder.commonReponse("Found",data,"wallet");
+  res.status(200).json(response);
+  } catch (error) {
+      next(error);
+  }
+}
+exports.ctrlWalletHistory = async (req,res,next)=>{
+  try { 
+  const history = await getWalletHistory(req.userId)
+  if(!history)
+  return next(APIError.customError("No wallet history found",404));
+  if(history.error)
+  return next(APIError.customError(history.error,400));
+  const data= responseBuilder.buildPlan(history);
+  const response= responseBuilder.commonReponse("Found",data,"history");
   res.status(200).json(response);
   } catch (error) {
       next(error);

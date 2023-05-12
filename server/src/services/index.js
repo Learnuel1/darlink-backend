@@ -52,7 +52,8 @@ exports.finalizePlanUpgrade = async(details) => PlanModule.upgradeCompletion(det
 // Wallet Secion
 exports.getWalletBalance = async (userId) => WalletModule.balance(userId);
 exports.createWallet = async (infor) => WalletModule.create(infor);
-exports.fundWallet = async (userId, amount, reference) => WalletModule.fund(userId, amount, reference);
+exports.fundWallet = async (userId, amount, reference,description) => WalletModule.fund(userId, amount, reference,description);
 exports.generateWalletTempRef = async(id, userId, tranType) => WalletModule.tempReference(id, userId, tranType);
 exports.getWalletTempReference = async(reference) => WalletModule.findTempReference(reference);
-exports.spendWallet = async (userId, amount, reference) => WalletModule.spend(userId, amount, reference);
+exports.spendWallet = async (userId, amount, reference,description) => WalletModule.spend(userId, amount, reference,description);
+exports.getWalletHistory = async (userId) => WalletModule.history(userId);

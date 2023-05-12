@@ -109,7 +109,7 @@ exports.paymentCompleted = async (req, res, next) => {
             }else{
               logger.info("Plan upgraded successfully", {meta: "Plan-service"});
               //update wallet 
-              const wallet = await spendWallet(temPlan.userId, (event.amount/100.0), event.reference)
+              const wallet = await spendWallet(temPlan.userId, (event.amount/100.0), event.reference, "Upgrade Plan")
               if(!wallet || wallet.length === 0 ){
                 APIError.customError("Wallet spensing  failed",400);
                 logger.info("Wallet spending failed", {meta:"paystack-wallet-service"});
@@ -125,7 +125,7 @@ exports.paymentCompleted = async (req, res, next) => {
                 }
           }else if(temPlan.type === ACTIONS.TRANSACTION_TYPE[1]){
             // fund wallet
-            const wallet = await fundWallet(temPlan.userId, (event.amount/100.0), event.reference);
+            const wallet = await fundWallet(temPlan.userId, (event.amount/100.0), event.reference, "Funded wallet");
             if(!wallet || wallet.length === 0 ){
               APIError.customError("Wallet funding failed",400);
               logger.info("Wallet funding failed", {meta:"paystack-wallet-service"});

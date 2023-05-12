@@ -443,11 +443,15 @@ CREATE PROCEDURE sp_fund_wallet
 @id varchar(255)
 ,@userId VARCHAR(255)
 ,@amount NUMERIC
+,@desc VARCHAR(50)
 AS
 BEGIN
 BEGIN TRY
 BEGIN TRAN
+    DECLARE @account VARCHAR(255)
+    SET @account = (SELECT balance FROM tblwallet WHERE userId = @userId);
      DELETE FROM tblwallet_reference WHERE id =@id;
+    INSERT tblwallet_log(refereceId, userId, [description], amount, balance) VALUES(@id, @userId,@desc,@amount,(@account-@amount))
     UPDATE tblwallet SET balance = balance + @amount, updatedAt = GETDATE() 
     WHERE  userId = @userId
   COMMIT TRAN
@@ -486,12 +490,16 @@ CREATE PROCEDURE sp_spend_wallet
 @id varchar(255)
 ,@userId VARCHAR(255)
 ,@amount NUMERIC
+,@desc VARCHAR(50)
 AS
 BEGIN
 BEGIN TRY
 BEGIN TRAN
+    DECLARE @account VARCHAR(255)
+     SET @account = (SELECT balance FROM tblwallet WHERE userId = @userId);
     UPDATE tblwallet SET balance = balance - @amount, updatedAt = GETDATE() 
     WHERE  userId = @userId
+      INSERT tblwallet_log(refereceId, userId, [description], amount, balance) VALUES(@id, @userId,@desc,@amount,(@account-@amount))
      DELETE FROM tblwallet_reference WHERE id =@id
     COMMIT TRAN
 END TRY

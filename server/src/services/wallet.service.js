@@ -26,10 +26,7 @@ exports.fund = async(userId, amount, reference)=>{
         req.input("id",sql.VarChar(255),reference)
         req.input("userId",sql.VarChar(255),userId)
         req.input("amount",sql.Numeric, amount)
-        await req.query(`DELETE FROM tblwallet_reference WHERE id =@id;
-        UPDATE tblwallet SET balance = balance + @amount, updatedAt = GETDATE() 
-        WHERE  userId = @userId`).then(result=>{
-          console.log(result)
+        await req.query(DB_ACTIONS.SP_FUND_WALLET).then(result=>{
             if(result.rowsAffected >0 || result.rowsAffected.length > 0)
             data= result.rowsAffected[0];
         }).catch(err=>{

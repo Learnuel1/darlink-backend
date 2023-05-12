@@ -1,6 +1,6 @@
 const { getPaystackSecreteKey, getPaystackCallBackUrl } = require("../config/env");
 const logger = require("../logger");
-const { getPlanById, generateTempRef, getTempReference, getUserPlan, finalizePlanUpgrade, fundWallet, getWalletTempReference, getWalletBalance } = require("../services");
+const { getPlanById, generateTempRef, getTempReference, getUserPlan, finalizePlanUpgrade, fundWallet, getWalletTempReference, getWalletBalance, spendWallet } = require("../services");
 const { ACTIONS } = require("../utils/actions");
 const { APIError } = require("../utils/apiError");
 const { paymentSuccessMailHandler } = require("../utils/mailer");
@@ -109,14 +109,24 @@ exports.paymentCompleted = async (req, res, next) => {
             }else{
               logger.info("Plan upgraded successfully", {meta: "Plan-service"});
               //update wallet 
-              //send email to customer 
-              const emailer = await paymentSuccessMailHandler(event.customer.email);
-              if (emailer.error) APIError.customError("Upgrade payment mail failed to send", 400)
-                  else logger.info("Upgrade payment success mail sent", {meta:"email-service"});
+              const wallet = await spendWallet(temPlan.userId, (event.amount/100.0), event.reference)
+              if(!wallet || wallet.length === 0 ){
+                APIError.customError("Wallet spensing  failed",400);
+                logger.info("Wallet spending failed", {meta:"paystack-wallet-service"});
+              }else if( wallet.error){ 
+                APIError.customError(wallet.error,400);
+                logger.info("Error occured during Wallet spending", {meta:"paystack-wallet-service"});
+              }else{
+                
+                //send email to customer 
+                const emailer = await paymentSuccessMailHandler(event.customer.email);
+                if (emailer.error) APIError.customError("Upgrade payment mail failed to send", 400)
+                    else logger.info("Upgrade payment success mail sent", {meta:"email-service"});
+              }
                 }
           }else if(temPlan.type === ACTIONS.TRANSACTION_TYPE[1]){
             // fund wallet
-            const wallet = await fundWallet(req.userId, (event.amount/100.0), event.reference);
+            const wallet = await fundWallet(temPlan.userId, (event.amount/100.0), event.reference);
             if(!wallet || wallet.length === 0 ){
               APIError.customError("Wallet funding failed",400);
               logger.info("Wallet funding failed", {meta:"paystack-wallet-service"});

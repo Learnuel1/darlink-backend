@@ -20,9 +20,14 @@ const buildPlan =(planObj)=>{
     const {id,userId,...data}=planObj;
 return data;
 }
+const buildHistory =(planObj)=>{
+    const {userId,...data}=planObj;
+return data;
+}
 module.exports ={
     buildUser,
     commonReponse,
     buildProfile,
     buildPlan,
+    buildHistory,
 }

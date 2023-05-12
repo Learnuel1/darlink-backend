@@ -442,7 +442,7 @@ GO
 CREATE PROCEDURE sp_fund_wallet
 @id varchar(255)
 ,@userId VARCHAR(255)
-,@amount DECIMAL(9)
+,@amount DECIMAL(10,2)
 AS
 BEGIN
 BEGIN TRY
@@ -481,3 +481,24 @@ RAISERROR(@em,16,1)
 END CATCH
 END
 GO
+
+CREATE PROCEDURE sp_fund_wallet
+@id varchar(255)
+,@userId VARCHAR(255)
+,@amount DECIMAL(9)
+AS
+BEGIN
+BEGIN TRY
+BEGIN TRAN
+    UPDATE tblwallet SET balance = balance + @amount, updatedAt = GETDATE() 
+    WHERE  userId = @userId
+     DELETE FROM tblwallet_reference WHERE id =@id
+    COMMIT TRAN
+END TRY
+BEGIN CATCH
+ROLLBACK TRAN
+DECLARE @em VARCHAR(150)
+SET @em = ERROR_MESSAGE()
+RAISERROR(@em,16,1)
+END CATCH
+END

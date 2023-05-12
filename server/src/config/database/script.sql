@@ -442,15 +442,15 @@ GO
 CREATE PROCEDURE sp_fund_wallet
 @id varchar(255)
 ,@userId VARCHAR(255)
-,@amount MONEY
+,@amount NUMERIC
 AS
 BEGIN
 BEGIN TRY
 BEGIN TRAN
+     DELETE FROM tblwallet_reference WHERE id =@id;
     UPDATE tblwallet SET balance = balance + @amount, updatedAt = GETDATE() 
     WHERE  userId = @userId
-     DELETE FROM tblwallet_reference WHERE id =@id
-    COMMIT TRAN
+  COMMIT TRAN
 END TRY
 BEGIN CATCH
 ROLLBACK TRAN
@@ -485,7 +485,7 @@ GO
 CREATE PROCEDURE sp_spend_wallet
 @id varchar(255)
 ,@userId VARCHAR(255)
-,@amount MONEY
+,@amount NUMERIC
 AS
 BEGIN
 BEGIN TRY

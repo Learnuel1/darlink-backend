@@ -115,7 +115,7 @@ exports.spend = async(userId, amount, reference, description)=>{
       await request
         .query(`SELECT * FROM tblwallet_log WHERE userId=@userId`)
         .then((result) => {
-          if (result.recordset.length > 0) data = result.recordset[0];
+          if (result.recordset.length > 0) data = result.recordset;
         })
         .then((err) => {
           if (err) data = { error: err };

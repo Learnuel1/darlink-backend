@@ -85,11 +85,13 @@ exports.ctrlWalletBalance = async (req,res,next)=>{
 exports.ctrlWalletHistory = async (req,res,next)=>{
   try { 
   const history = await getWalletHistory(req.userId)
-  if(!history)
+  if(!history || history.length === 0)
   return next(APIError.customError("No wallet history found",404));
   if(history.error)
   return next(APIError.customError(history.error,400));
-  const data= responseBuilder.buildPlan(history);
+  const data= history.map((cur) => {
+   return responseBuilder.buildHistory(cur);
+  }) 
   const response= responseBuilder.commonReponse("Found",data,"history");
   res.status(200).json(response);
   } catch (error) {

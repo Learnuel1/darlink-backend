@@ -451,7 +451,7 @@ BEGIN TRAN
     DECLARE @account VARCHAR(255)
     SET @account = (SELECT balance FROM tblwallet WHERE userId = @userId);
      DELETE FROM tblwallet_reference WHERE id =@id;
-    INSERT tblwallet_log(refereceId, userId, [description], amount, balance) VALUES(@id, @userId,@desc,@amount,(@account-@amount))
+    INSERT tblwallet_log(refereceId, userId, [description], amount, balance) VALUES(@id, @userId,@desc,@amount,(@account+@amount))
     UPDATE tblwallet SET balance = balance + @amount, updatedAt = GETDATE() 
     WHERE  userId = @userId
   COMMIT TRAN

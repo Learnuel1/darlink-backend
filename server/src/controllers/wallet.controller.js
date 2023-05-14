@@ -1,5 +1,5 @@
 const https = require('https');
-const { getPaystackWalletCallBackUrl } = require('../config/env');
+const { getPaystackCallBackUrl } = require('../config/env');
 const { options, verifyOtions } = require('../utils/paystack.auth');
 const { APIError } = require('../utils/apiError');
 const logger = require('../logger');
@@ -12,7 +12,7 @@ exports.ctrlInitiateTransaction = async ( req, res, next) => {
       const {amount } = req.body;
       if(!amount) return next(APIError.badRequest("Amount is required"));
       if(amount <= 0) return next(APIError.badRequest("Invalid amount"));
-    const callback_url = getPaystackWalletCallBackUrl(); 
+    const callback_url = getPaystackCallBackUrl(); 
     const params = JSON.stringify({
       "email": req.email,
       "amount": amount*100,

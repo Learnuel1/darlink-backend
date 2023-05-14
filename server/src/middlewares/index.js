@@ -1,5 +1,5 @@
 const errorMiddleWareModule = require("./error.middleware")
 
-module.exports ={
+module.exports = {
     errorMiddleWareModule,
 }   
